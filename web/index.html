@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Banane9's InvScan Page</title>
+		<script src="./js/mcInventory.js" language="JavaScript"></script>
+		<style type="text/css">
+			#inventory
+			{
+					padding-top:20px;
+			}
+		</style>
+		<script language="JavaScript">
+			getXMLHTTPRequest = function(onDone)
+			{
+				var xmlhttp;
+				if (window.XMLHttpRequest)
+				{
+					xmlhttp = new XMLHttpRequest();
+				}
+				else
+				{
+					xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+				
+				xmlhttp.onreadystatechange = function()
+				{
+					if (xmlhttp.readyState == xmlhttp.DONE && xmlhttp.status == 200)
+					{
+						onDone(this.responseText);
+					}
+				}
+				return xmlhttp;
+			};
+			
+			getInventoryFor = function(name, onDone)
+			{
+				xmlhttp = getXMLHTTPRequest(onDone);
+				xmlhttp.open("GET", "./php/getInventory.php?name=" + name, true);
+				xmlhttp.send();
+				inventory.setPlayerName(name);
+			};
+			
+			updateInventory = function(response)
+			{
+				var content = {}
+				if (JSON != null)
+				{
+					content = JSON.parse(response);
+				}
+				else
+				{
+					content = eval(response);
+				}
+				
+				if (content != null && content != {})
+				{
+					inventory.setContent(content);
+				}
+			}
+			
+			updateSelectedPlayer = function(formV)
+			{
+				var player = formV.elements.playerName.value;
+				getInventoryFor(player, updateInventory);
+			};
+		</script>
+	</head>
+	<body>
+		<h1 style="margin-left:auto; margin-right:auto; width:50%; text-align:center; border-bottom-style:solid; border-bottom-width:2px; border-bottom-color:#000000;">Banane9's InvScan Page</h1>
+		<div align="center">
+			<form name="player" onchange="updateSelectedPlayer(this);" action="">
+				<select name="playerName" size="1">
+					<option selected="selected">Choose a Player</option>
+				</select>
+			</form>
+			<canvas id="inventory" align="center">
+				<p>Please use a browser that supports the HTML5 Canvas Element!</p>
+			</canvas>
+		</div>
+		<script language="JavaScript">
+			inventory = new mcInventory("inventory", 1, "", []);
+			
+			addOptions = function(response)
+			{
+				var players = {}
+				if (JSON != null)
+				{
+					players = JSON.parse(response);
+				}
+				else
+				{
+					players = eval(response);
+				}
+				
+				if (players != null && players != {})
+				{
+					var playerSelect = document.forms.player.elements.playerName;
+					for (i in players)
+					{
+						var option = document.createElement("option");
+						option.text = players[i];
+						option.value = players[i];
+						playerSelect.add(option);
+					}
+				}
+			};
+			
+			xmlhttp = getXMLHTTPRequest(addOptions);
+			xmlhttp.open("GET", "./php/getPlayerNames.php", true);
+			xmlhttp.send();
+		</script>
+	</body>
+</html>
