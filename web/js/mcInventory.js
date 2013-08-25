@@ -11,8 +11,12 @@ countDown = function(times, onDone)
 			this.onDone();
 		}
 	};
-	this.reset = function()
+	this.reset = function(nTimes)
 	{
+		if (nTimes != null)
+		{
+			this.times = nTimes;
+		}
 		this.current = this.times;
 	};
 };
@@ -64,13 +68,14 @@ mcInventory = function(canvasId, scale, name, content)
 		this.context.drawImage(this.inventoryImage, 0, 0, 176 * this.scale, 166 * this.scale);
 		for (i in this.content)
 		{
-			this.context.drawImage(this.content[i], this.slotCoordinates[i].x, this.slotCoordinates[i].y, 16 * this.scale, 16 * this.scale);
+			this.context.drawImage(this.content[i], this.slotCoordinates[this.content[i].slot].x, this.slotCoordinates[this.content[i].slot].y, 16 * this.scale, 16 * this.scale);
 		}
 	};
 	
 	this.setScale = function(nScale)
 	{
 		this.scale = nScale;
+		this.slotCoordinates = this.getSlotCoordinates(nScale);
 		this.canvas.width = 176 * nScale;
 		this.canvas.height = 166 * nScale;
 		this.update();
@@ -84,13 +89,15 @@ mcInventory = function(canvasId, scale, name, content)
 	this.setContent = function(nContent)
 	{
 		var nContentArray = [];
-		this.loadCountDown.reset();
+		this.loadCountDown.reset(nContent.length);
 		for (i in nContent)
 		{
 			var image = new Image();
 				image.parent = this;
+				image.slot = nContent[i].slot - 1;
+				image.quantity = nContent[i].quantity;
 				image.onload = function() { this.parent.loadCountDown.decrement(); };
-				image.src = nContent[i];
+				image.src = "./texture/" + nContent[i].itemName + ".png";
 			nContentArray[nContentArray.length] = image;
 		}
 		this.content = nContentArray;

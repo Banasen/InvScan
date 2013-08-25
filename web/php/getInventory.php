@@ -1,20 +1,20 @@
 <?php
-require_once("./MySQLConnect.php");
+require_once './MySQLConnect.php';
 
-$query = mysql_query("SELECT * FROM `invscan`.`invs` WHERE `name` LIKE '".$_GET["name"]."';");
-$result = mysql_fetch_assoc($query);
-$toSend = array();
-foreach ($result as $index => $filename)
+if(isset($_GET['name']))
 {
-	if ($index != "name" && $index != "timestamp")
+	$stmt = $db->prepare('SELECT itemName, slot, quantity FROM invscan.items WHERE playerName = :name ORDER BY slot ASC');
+	$stmt->execute($_GET);
+	$result = $stmt->fetchAll();
+	$toSend = array();
+	foreach($result as $i => $stack)
 	{
-		if (!file_exists("../texture/".$filename.".png"))
+		if (!file_exists("../texture/".$stack["itemName"].".png"))
 		{
-			$filename = "unknown";
+			$stack["itemName"] = "unknown";
 		}
-		$toSend[$index] = "./texture/".$filename.".png";
+		$toSend[$i] = $stack;
 	}
+	echo json_encode($toSend);
 }
-echo json_encode($toSend);
-mysql_close($mysql_link);
 ?>

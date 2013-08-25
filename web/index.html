@@ -62,6 +62,7 @@
 			{
 				var player = formV.elements.playerName.value;
 				getInventoryFor(player, updateInventory);
+				inventory.setScale(parseFloat(formV.elements.scale.value));
 			};
 		</script>
 	</head>
@@ -72,6 +73,7 @@
 				<select name="playerName" size="1">
 					<option selected="selected">Choose a Player</option>
 				</select>
+				<span>Scale: <input type="text" name="scale" size="5" maxlength="4" value="1"></span>
 			</form>
 			<canvas id="inventory" align="center">
 				<p>Please use a browser that supports the HTML5 Canvas Element!</p>
@@ -98,8 +100,8 @@
 					for (i in players)
 					{
 						var option = document.createElement("option");
-						option.text = players[i];
-						option.value = players[i];
+						option.text = players[i].playerName;
+						option.value = players[i].playerName;
 						playerSelect.add(option);
 					}
 				}

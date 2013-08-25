@@ -10,4 +10,7 @@ ehthumbs.db
 Desktop.ini
 
 # Texture Folder
-/web/texture/*
+web/texture/*
+
+# Private stuff
+web/php/MySQLConnect.php
