@@ -1,5 +1,5 @@
 os.loadAPI("ocs/apis/sensor")
-proxSensor = sensor.wrap("top")
+proxSensor = sensor.wrap("front")
 
 baseURL = "http://sp.svennp.com/invscan/php/post.php?"
 
@@ -15,7 +15,7 @@ while true do
 			for slot, stack in pairs(details.Inventory) do
 				if stack.RawName then
 					postInfo = postInfo.."item["..slot.."][rawName]="..stack.RawName.."&"
-					postInfo = postInfo.."item["..slot.."][name]="..stack.name.."&"
+					postInfo = postInfo.."item["..slot.."][name]="..stack.Name.."&"
 					postInfo = postInfo.."item["..slot.."][size]="..stack.Size.."&"
 				end
 			end
@@ -35,4 +35,5 @@ while true do
 			until completed
 		end
 	end
+	sleep(4)
 end

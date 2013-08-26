@@ -75,14 +75,18 @@
 						event.offsetY <= inventory.slotCoordinates[inventory.content[i].stack.slot].y + 16 * inventory.scale)
 					{
 						console.log("Slot: " + inventory.content[i].stack.slot);
-						var infoBox = document.getElementById("infoBox");
+						infoBox = document.getElementById("infoBox");
 						infoBox.innerHTML = inventory.content[i].stack.itemName;
-						infoBox.style.setAttribute("display", "visible");
-						infoBox.style.setAttribute("position", "absolute");
+						infoBox.style.setAttribute("visibility", "visible");
 						infoBox.style.setAttribute("left", event.x + "px");
 						infoBox.style.setAttribute("top", event.y + "px");
 					}
 				}
+			};
+			
+			hideInfoBox = function()
+			{
+				document.getElementById("infoBox").style.setAttribute("visibility", "hidden");
 			};
 		</script>
 	</head>
@@ -95,11 +99,11 @@
 				</select>
 				<span style="margin-left:20px;">Scale: <input type="text" name="scale" size="5" maxlength="4" value="1"></span>
 			</form>
-			<canvas id="inventory" align="center" onmousemove="e = event; displayInfoFor(event);">
+			<canvas id="inventory" align="center" onmousemove="e = event; displayInfoFor(event);" onmouseout="hideInfoBox();">
 				<p>Please use a browser that supports the HTML5 Canvas Element!</p>
 			</canvas>
 		</div>
-		<span id="infoBox" style="display:none;"></span>
+		<span id="infoBox" style="visibility:hidden; position:absolute;"></span>
 		<script language="JavaScript">
 			inventory = new mcInventory("inventory", 1, "", []);
 			

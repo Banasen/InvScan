@@ -68,7 +68,7 @@ mcInventory = function(canvasId, scale, name, content)
 		this.context.drawImage(this.inventoryImage, 0, 0, 176 * this.scale, 166 * this.scale);
 		for (i in this.content)
 		{
-			this.context.drawImage(this.content[i], this.slotCoordinates[this.content[i].slot].x, this.slotCoordinates[this.content[i].slot].y, 16 * this.scale, 16 * this.scale);
+			this.context.drawImage(this.content[i], this.slotCoordinates[this.content[i].stack.slot].x, this.slotCoordinates[this.content[i].stack.slot].y, 16 * this.scale, 16 * this.scale);
 		}
 	};
 	
@@ -95,7 +95,7 @@ mcInventory = function(canvasId, scale, name, content)
 			nContent[i].slot--;
 			var image = new Image();
 				image.parent = this;
-				image.stack = nContent[i]
+				image.stack = nContent[i];
 				image.onload = function() { this.parent.loadCountDown.decrement(); };
 				image.src = "./texture/" + nContent[i].itemRawName + ".png";
 			nContentArray[nContentArray.length] = image;
