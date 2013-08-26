@@ -92,12 +92,12 @@ mcInventory = function(canvasId, scale, name, content)
 		this.loadCountDown.reset(nContent.length);
 		for (i in nContent)
 		{
+			nContent[i].slot--;
 			var image = new Image();
 				image.parent = this;
-				image.slot = nContent[i].slot - 1;
-				image.quantity = nContent[i].quantity;
+				image.stack = nContent[i]
 				image.onload = function() { this.parent.loadCountDown.decrement(); };
-				image.src = "./texture/" + nContent[i].itemName + ".png";
+				image.src = "./texture/" + nContent[i].itemRawName + ".png";
 			nContentArray[nContentArray.length] = image;
 		}
 		this.content = nContentArray;

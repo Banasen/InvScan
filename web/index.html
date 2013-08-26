@@ -64,6 +64,26 @@
 				getInventoryFor(player, updateInventory);
 				inventory.setScale(parseFloat(formV.elements.scale.value));
 			};
+			
+			displayInfoFor = function(event)
+			{
+				for (i in inventory.content)
+				{
+					if (event.offsetX >= inventory.slotCoordinates[inventory.content[i].stack.slot].x && 
+						event.offsetY >= inventory.slotCoordinates[inventory.content[i].stack.slot].y &&
+						event.offsetX <= inventory.slotCoordinates[inventory.content[i].stack.slot].x + 16 * inventory.scale &&
+						event.offsetY <= inventory.slotCoordinates[inventory.content[i].stack.slot].y + 16 * inventory.scale)
+					{
+						console.log("Slot: " + inventory.content[i].stack.slot);
+						var infoBox = document.getElementById("infoBox");
+						infoBox.innerHTML = inventory.content[i].stack.itemName;
+						infoBox.style.setAttribute("display", "visible");
+						infoBox.style.setAttribute("position", "absolute");
+						infoBox.style.setAttribute("left", event.x + "px");
+						infoBox.style.setAttribute("top", event.y + "px");
+					}
+				}
+			};
 		</script>
 	</head>
 	<body>
@@ -73,12 +93,13 @@
 				<select name="playerName" size="1">
 					<option selected="selected">Choose a Player</option>
 				</select>
-				<span>Scale: <input type="text" name="scale" size="5" maxlength="4" value="1"></span>
+				<span style="margin-left:20px;">Scale: <input type="text" name="scale" size="5" maxlength="4" value="1"></span>
 			</form>
-			<canvas id="inventory" align="center">
+			<canvas id="inventory" align="center" onmousemove="e = event; displayInfoFor(event);">
 				<p>Please use a browser that supports the HTML5 Canvas Element!</p>
 			</canvas>
 		</div>
+		<span id="infoBox" style="display:none;"></span>
 		<script language="JavaScript">
 			inventory = new mcInventory("inventory", 1, "", []);
 			

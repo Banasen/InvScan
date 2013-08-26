@@ -1,31 +1,38 @@
 os.loadAPI("ocs/apis/sensor")
-p = sensor.wrap("front")
+proxSensor = sensor.wrap("top")
+
+baseURL = "http://sp.svennp.com/invscan/php/post.php?"
+
 rs.setOutput("top", false)
 while true do
-	url = "http://sp.svennp.com/invscan/php/post.php?"
-	t = p.getTargets()
-	if #t then
-		for a,b in pairs(t) do
-			td = nil
-			td = p.getTargetDetails(a)
-			if td.RawName ~= nil then
-				if math.floor(td.Position.Y) == 1 and math.floor(td.Position.X) == 0 and math.floor(td.Position.Z) == 1 then
-					rs.setOutput("top", true)
-					print("making url to post")
-					for i = 1,40 do
-						if td.Inventory[i].RawName ~= nil then
-							url = url.."item["..i.."][name]="..td.Inventory[i].RawName.."&"
-							url = url.."item["..i.."][size]="..td.Inventory[i].Size.."&"
-						end
-					end
-					url = url.."name="..a
-					print("sending info")
-					sleep(0.2)
-					http.get(url)
-					rs.setOutput("top", false)
-					sleep(2)
+	targets = proxSensor.getTargets()
+	for name, information in pairs(targets) do
+		if information.RawName == "net.minecraft.entity.player.EntityPlayerMP" then
+			print("Player ["..name.."] found!")
+			local details = proxSensor.getTargetDetails(name)
+			local postInfo = ""
+			print("Creating info string!")
+			for slot, stack in pairs(details.Inventory) do
+				if stack.RawName then
+					postInfo = postInfo.."item["..slot.."][rawName]="..stack.RawName.."&"
+					postInfo = postInfo.."item["..slot.."][name]="..stack.name.."&"
+					postInfo = postInfo.."item["..slot.."][size]="..stack.Size.."&"
 				end
 			end
+			-- Add more info?
+			print("Starting http-request!")
+			http.request(baseURL.."name="..name, postInfo)
+			completed = false
+			repeat
+				local event, url, sourceText = os.pullEvent()
+				if event == "http_success" then
+					print("Success!")
+					completed = true
+				elseif event == "http_failure" then
+					print("Failure!")
+					completed = true
+				end
+			until completed
 		end
 	end
 end
