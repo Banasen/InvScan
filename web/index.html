@@ -1,109 +1,98 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Banane9's InvScan Page</title>
+		<title>InvScan</title>
+		<!-- Include the inventory javascript file -->
 		<script src="./js/mcInventory.js" language="JavaScript"></script>
 		<style type="text/css">
 			#inventory
 			{
-					padding-top:20px;
+				margin-top:20px;
 			}
 		</style>
 		<script language="JavaScript">
-			getXMLHTTPRequest = function(onDone)
+			//Function to update the player name and inventory content function when a different player is selected
+			updatePlayer = function(formV)
 			{
-				var xmlhttp;
-				if (window.XMLHttpRequest)
-				{
-					xmlhttp = new XMLHttpRequest();
-				}
-				else
-				{
-					xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-				}
-				
-				xmlhttp.onreadystatechange = function()
-				{
-					if (xmlhttp.readyState == xmlhttp.DONE && xmlhttp.status == 200)
-					{
-						onDone(this.responseText);
-					}
-				}
-				return xmlhttp;
-			};
-			
-			getInventoryFor = function(name, onDone)
-			{
-				xmlhttp = getXMLHTTPRequest(onDone);
-				xmlhttp.open("GET", "./php/getInventory.php?name=" + name, true);
-				xmlhttp.send();
+				//Get the selected login
+				var name = formV.elements.playerName.value;
 				inventory.setPlayerName(name);
-			};
-			
-			updateInventory = function(response)
-			{
-				var content = {}
-				if (JSON != null)
-				{
-					content = JSON.parse(response);
-				}
-				else
-				{
-					content = eval(response);
-				}
-				
-				if (content != null && content != {})
-				{
-					inventory.setContent(content);
-				}
-			}
-			
-			updateSelectedPlayer = function(formV)
-			{
-				var player = formV.elements.playerName.value;
-				getInventoryFor(player, updateInventory);
-				inventory.setScale(parseFloat(formV.elements.scale.value));
 			};
 			
 			displayInfoFor = function(event)
 			{
+				//Variable for checking if the Mouse is actually over a filled slot
+				var overSlot = false;
+				//Get the Tool-Tip div by its Id
+				var infoBox = document.getElementById("infoBox");
+				//Loop through all the filled slots
 				for (i in inventory.content)
 				{
-					if (event.offsetX >= inventory.slotCoordinates[inventory.content[i].stack.slot].x && 
-						event.offsetY >= inventory.slotCoordinates[inventory.content[i].stack.slot].y &&
-						event.offsetX <= inventory.slotCoordinates[inventory.content[i].stack.slot].x + 16 * inventory.scale &&
-						event.offsetY <= inventory.slotCoordinates[inventory.content[i].stack.slot].y + 16 * inventory.scale)
+					//Make a variable for the start coordinates of the current slot (shorter in the if)
+					var slotCoordinates = inventory.slotCoordinates[inventory.content[i].stack.slot];
+					/*Check if the Mouse is over the slot
+					 >= to start coordinates
+					 <= to start coordinates + the scaled size of the slot */
+					if (event.offsetX >= slotCoordinates.x && 
+						event.offsetY >= slotCoordinates.y &&
+						event.offsetX <= slotCoordinates.x + 16 * inventory.scale &&
+						event.offsetY <= slotCoordinates.y + 16 * inventory.scale)
 					{
-						console.log("Slot: " + inventory.content[i].stack.slot);
-						infoBox = document.getElementById("infoBox");
-						infoBox.innerHTML = inventory.content[i].stack.itemName;
+						//Mouse is over a filled slot
+						overSlot = true;
+						//Change Tool-Tip to the item's name
+						infoBox.children.infoBoxText.innerHTML = inventory.content[i].stack.itemName;
+						//Make the background fit the new Text
+						infoBox.children.infoBoxTextureMiddle.style.setAttribute("width", (infoBox.children.infoBoxText.offsetWidth - 8) + "px");
+						infoBox.children.infoBoxTextureRight.style.setAttribute("left", (infoBox.children.infoBoxText.offsetWidth - 4) + "px");
+						//Make the Tool-Tip visible and move it to the Mouse (not exactly to it, so it doesn't flicker when you move the mouse in that direction)
+						infoBox.style.setAttribute("left", (event.x + 6) + "px");
+						infoBox.style.setAttribute("top", (event.y + 6) +"px");
 						infoBox.style.setAttribute("visibility", "visible");
-						infoBox.style.setAttribute("left", event.x + "px");
-						infoBox.style.setAttribute("top", event.y + "px");
 					}
 				}
+				//If the Mouse is not over a filled slot, hide the Tool-Tip
+				if(!overSlot)
+				{
+					infoBox.style.setAttribute("visibility", "hidden");
+				}
 			};
-			
-			hideInfoBox = function()
+			//Function to hide the Tool-Tip when the Mouse leaves the canvas for the inventory
+			hideInfoBox = function(which)
 			{
 				document.getElementById("infoBox").style.setAttribute("visibility", "hidden");
+			};
+			
+			updateSettings = function(formV)
+			{
+				console.log(formV.elements.scale.value);
+				inventory.setScale(parseFloat(formV.elements.scale.value));
 			};
 		</script>
 	</head>
 	<body>
 		<h1 style="margin-left:auto; margin-right:auto; width:50%; text-align:center; border-bottom-style:solid; border-bottom-width:2px; border-bottom-color:#000000;">Banane9's InvScan Page</h1>
 		<div align="center">
-			<form name="player" onchange="updateSelectedPlayer(this);" action="">
+			<div>
+			<form name="player" onchange="updatePlayer(this);" action="" style="display:inline;">
 				<select name="playerName" size="1">
 					<option selected="selected">Choose a Player</option>
 				</select>
-				<span style="margin-left:20px;">Scale: <input type="text" name="scale" size="5" maxlength="4" value="1"></span>
 			</form>
+			<form name="settings" onchange="updateSettings(this);" action="" style="display:inline; margin-left:30px;">
+				Scale: <input type="text" name="scale" size="3" maxlength="2" value="1">
+			</form>
+			</div>
 			<canvas id="inventory" align="center" onmousemove="e = event; displayInfoFor(event);" onmouseout="hideInfoBox();">
 				<p>Please use a browser that supports the HTML5 Canvas Element!</p>
 			</canvas>
 		</div>
-		<span id="infoBox" style="visibility:hidden; position:absolute;"></span>
+		<div id="infoBox" style="visibility:hidden; position:absolute; color:#F0F0F0; padding:0px;">
+			<img id="infoBoxTextureLeft" src="./texture/tooltip-left.png" width="4" height="30" style="width:4px; height:30px; position:absolute; top:0px; left:0px;"/>
+			<img id="infoBoxTextureMiddle" src="./texture/tooltip-middle.png" style="width:auto; height:30px; position:absolute; top:0px; left:4px;"/>
+			<img id="infoBoxTextureRight" src="./texture/tooltip-right.png" style="width:4px; height:30px; position:absolute; left:5px; top:0px;"/>
+			<span id="infoBoxText" style="position:absolute; top:0px; left:0px; padding:6px; white-space:nowrap;">Test</span>
+		</div>
 		<script language="JavaScript">
 			inventory = new mcInventory("inventory", 1, "", []);
 			
@@ -132,9 +121,16 @@
 				}
 			};
 			
-			xmlhttp = getXMLHTTPRequest(addOptions);
-			xmlhttp.open("GET", "./php/getPlayerNames.php", true);
-			xmlhttp.send();
+			xmlhttp = new XMLHttpRequest(addOptions);
+				xmlhttp.onreadystatechange = function()
+				{
+					if (this.readyState == this.DONE && this.status == 200)
+					{
+						addOptions(this.responseText);
+					}
+				};
+				xmlhttp.open("GET", "./php/getPlayerNames.php");
+				xmlhttp.send();
 		</script>
 	</body>
 </html>

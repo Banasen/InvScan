@@ -49,6 +49,7 @@ mcInventory = function(canvasId, scale, name, content)
 	
 	this.drawSkin = function()
 	{
+		//drawImage(image, src_start_x, src_start_y, src_size_x, src_size_y, dest_start_x, dest_start_y, dest_size_x, dest_size_y);
 		//draw the head
 		this.context.drawImage(this.skinImage, 8, 8,  8, 8, 48 * this.scale, 27 * this.scale, 8 * this.scale, 8 * this.scale);
 		//draw the body
@@ -65,7 +66,9 @@ mcInventory = function(canvasId, scale, name, content)
 	
 	this.drawContent = function()
 	{
+		//Draw Inventory Image, to scale
 		this.context.drawImage(this.inventoryImage, 0, 0, 176 * this.scale, 166 * this.scale);
+		//Loop through all the filled slots and draw their image at the slot's coordinates, to scale
 		for (i in this.content)
 		{
 			this.context.drawImage(this.content[i], this.slotCoordinates[this.content[i].stack.slot].x, this.slotCoordinates[this.content[i].stack.slot].y, 16 * this.scale, 16 * this.scale);
@@ -74,18 +77,53 @@ mcInventory = function(canvasId, scale, name, content)
 	
 	this.setScale = function(nScale)
 	{
-		this.scale = nScale;
-		this.slotCoordinates = this.getSlotCoordinates(nScale);
-		this.canvas.width = 176 * nScale;
-		this.canvas.height = 166 * nScale;
-		this.update();
+		if (nScale != this.scale)
+		{
+			this.scale = nScale;
+			this.slotCoordinates = this.getSlotCoordinates(nScale);
+			this.canvas.width = 176 * nScale;
+			this.canvas.height = 166 * nScale;
+			this.update();
+		}
 	};
+	
 	this.setPlayerName = function(name)
 	{
-		this.playerName = name;
-		this.skinURL = "http://minecraft.net/skin/" + name + ".png";
-		this.skinImage.src = this.skinURL;
+		if (name != this.playerName)
+		{
+			this.playerName = name;
+			this.getInventoryFor(name);
+			this.skinURL = "http://minecraft.net/skin/" + name + ".png";
+			this.skinImage.src = this.skinURL;
+		}
 	};
+	
+	this.getInventoryFor = function(name)
+	{
+		var xmlhttp = new XMLHttpRequest();
+			xmlhttp.parent = this;
+			//Set the function that calls the setContent method if it successfully completes
+			xmlhttp.onreadystatechange = function()
+			{
+				//Check if the request successfully completed
+				if (this.readyState == this.DONE && this.status == 200)
+				{
+					//Parse the JSON returned by the getInventory.php into a object
+					var content = JSON.parse(this.responseText);
+					//Check that it's not null
+					if (content != null)
+					{
+						//Update the inventory's content with the newly received
+						this.parent.setContent(content);
+					}
+				}
+			};
+			//Set the request url to the getInventory.php
+			xmlhttp.open("GET", "./php/getInventory.php?name=" + name);
+			//Send the request
+			xmlhttp.send();
+	};
+	
 	this.setContent = function(nContent)
 	{
 		var nContentArray = [];
