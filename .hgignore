@@ -14,3 +14,13 @@ web/texture/*
 
 # Private stuff
 web/php/MySQLConnect.php
+
+# Compiled Python code
+.*\.pyc$
+
+# Virtualenv
+^virtualenv/bin/
+^virtualenv/include/
+^virtualenv/lib/
+^virtualenv/webpage/sqlite3.db$
+
