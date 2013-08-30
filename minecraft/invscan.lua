@@ -11,14 +11,24 @@ while true do
             print("Player ["..name.."] found!")
             local details = proxSensor.getTargetDetails(name)
             local postInfo = ""
+            local postJson = '{'
+            local first = true
             print("Creating info string!")
             for slot, stack in pairs(details.Inventory) do
                 if stack.RawName then
                     postInfo = postInfo.."item["..slot.."][rawName]="..stack.RawName.."&"
                     postInfo = postInfo.."item["..slot.."][name]="..stack.Name.."&"
                     postInfo = postInfo.."item["..slot.."][size]="..stack.Size.."&"
+                    if first then
+                        first = false
+                    else
+                        postJson = postJson .. ','
+                    end
+                    postJson = postJson .. '"'..slot..'":{' .. '"rawname":"' .. stack.RawName .. '","name":"' .. stack.Name .. '","size":' .. stack.Size .. '}'
                 end
             end
+            postJson = postJson .. '}'
+            postInfo = postInfo .. 'json=' .. postJson
             -- Add more info?
             print("Starting http-request!")
             http.request(baseURL..name, postInfo)
