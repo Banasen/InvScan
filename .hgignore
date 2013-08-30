@@ -1,0 +1,16 @@
+#############
+## Windows detritus
+#############
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Texture Folder
+web/texture/*
+
+# Private stuff
+web/php/MySQLConnect.php
