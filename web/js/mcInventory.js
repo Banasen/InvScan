@@ -2,6 +2,7 @@ countDown = function(times, onDone)
 {
 	this.times = times;
 	this.current = times;
+	this.complete = false;
 	this.onDone = onDone;
 	this.decrement = function()
 	{
@@ -9,6 +10,7 @@ countDown = function(times, onDone)
 		if (this.current <= 0)
 		{
 			this.onDone();
+			this.complete = true;
 		}
 	};
 	this.reset = function(nTimes)
@@ -18,10 +20,25 @@ countDown = function(times, onDone)
 			this.times = nTimes;
 		}
 		this.current = this.times;
+		this.complete = false;
 	};
 };
 
-mcInventory = function(canvasId, scale, name, content)
+parseAnimation = function(animationInfo)
+{
+	var animation = {frames: [], currentFrame: 0, currentFrameDuration: 0};
+	for (i in animationInfo)
+	{
+		var info = animationInfo[i].split("*");
+		if (info[0] != "")
+		{
+			animation.frames[animation.frames.length] = {sprite: info[0], duration: info[1] != null && info[1] != "" ? info[1] : 1};
+		}
+	}
+	return animation;
+};
+
+mcInventory = function(canvasId, scale, name, content, animatedContent)
 {	
 	this.getSlotCoordinates = function(s)
 	{
@@ -75,6 +92,27 @@ mcInventory = function(canvasId, scale, name, content)
 		}
 	};
 	
+	this.drawAnimatedContent = function()
+	{
+		if (this.loadCountDown.complete)
+		{
+			for (i in this.animatedContent)
+			{
+				//Increment the duration of the current frame
+				this.animatedContent[i].animation.currentFrameDuration++;
+				//If the duration is (higher or) equal to the duration it should stay, go draw the next frame and go to the next one
+				if (this.animatedContent[i].animation.currentFrameDuration >= this.animatedContent[i].animation.frames[this.animatedContent[i].animation.currentFrame].duration)
+				{
+					//Increment the currentFrame or revert it to the first when at the end
+					this.animatedContent[i].animation.currentFrame = (this.animatedContent[i].animation.currentFrame + 1) % this.animatedContent[i].animation.frames.length;
+					this.animatedContent[i].animation.currentFrameDuration = 0;
+					//drawImage(image, src_start_x, src_start_y, src_size_x, src_size_y, dest_start_x, dest_start_y, dest_size_x, dest_size_y);
+					this.context.drawImage(this.animatedContent[i], 0, 16 + 16 * this.animatedContent[i].animation.currentFrame, 16, 16, this.slotCoordinates[this.animatedContent[i].stack.slot].x, this.slotCoordinates[this.animatedContent[i].stack.slot].y, 16 * this.scale, 16 * this.scale);
+				}
+			}
+		}
+	};
+	
 	this.setScale = function(nScale)
 	{
 		if (nScale != this.scale)
@@ -119,7 +157,7 @@ mcInventory = function(canvasId, scale, name, content)
 				}
 			};
 			//Set the request url to the getInventory.php
-			xmlhttp.open("GET", "./php/getInventory.php?name=" + name);
+			xmlhttp.open("GET", "http://sp.svennp.com/invscan/php/getInventory.php?name=" + name);
 			//Send the request
 			xmlhttp.send();
 	};
@@ -127,6 +165,7 @@ mcInventory = function(canvasId, scale, name, content)
 	this.setContent = function(nContent)
 	{
 		var nContentArray = [];
+		var nAnimatedContentArray = [];
 		this.loadCountDown.reset(nContent.length);
 		for (i in nContent)
 		{
@@ -135,10 +174,19 @@ mcInventory = function(canvasId, scale, name, content)
 				image.parent = this;
 				image.stack = nContent[i];
 				image.onload = function() { this.parent.loadCountDown.decrement(); };
-				image.src = "./texture/" + nContent[i].itemRawName + ".png";
-			nContentArray[nContentArray.length] = image;
+				image.src = "http://sp.svennp.com/invscan/texture/" + nContent[i].itemRawName + ".png";
+			if (nContent[i].animation != null)
+			{
+				image.animation = parseAnimation(nContent[i].animation);
+				nAnimatedContentArray[nAnimatedContentArray.length] = image;
+			}
+			else
+			{
+				nContentArray[nContentArray.length] = image;
+			}
 		}
 		this.content = nContentArray;
+		this.animatedContent = nAnimatedContentArray;
 	};
 	
 	this.update = function()
@@ -156,6 +204,7 @@ mcInventory = function(canvasId, scale, name, content)
 	this.context = this.canvas.getContext("2d");
 	this.scale = scale;
 	this.content = content;
+	this.animatedContent = animatedContent;
 	this.slotCoordinates = this.getSlotCoordinates(scale);
 	this.playerName = name;
 	this.skinURL = "http://minecraft.net/images/char.png";

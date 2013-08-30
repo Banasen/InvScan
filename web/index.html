@@ -3,97 +3,131 @@
 	<head>
 		<title>InvScan</title>
 		<!-- Include the inventory javascript file -->
-		<script src="./js/mcInventory.js" language="JavaScript"></script>
+		<script src="./js/mcInventory.js"></script>
 		<style type="text/css">
 			#inventory
 			{
 				margin-top:20px;
+				margin-right:auto;
+				margin-left:auto;
 			}
 		</style>
-		<script language="JavaScript">
+		<script>
 			//Function to update the player name and inventory content function when a different player is selected
-			updatePlayer = function(formV)
+			updatePlayer = function(select)
 			{
 				//Get the selected login
-				var name = formV.elements.playerName.value;
-				inventory.setPlayerName(name);
+				inventory.setPlayerName(select.value);
 			};
 			
 			displayInfoFor = function(event)
 			{
+				/*	For Canvas Text:
+					this.context.fillStyle = "#E0E0E0";
+					this.context.font = (8 * this.scale) + "px Arial";
+					this.context.fillText(text, x, y); */
 				//Variable for checking if the Mouse is actually over a filled slot
 				var overSlot = false;
 				//Get the Tool-Tip div by its Id
 				var infoBox = document.getElementById("infoBox");
 				//Loop through all the filled slots
-				for (i in inventory.content)
+				cntnt = ["content", "animatedContent"];
+				for (c in cntnt)
 				{
-					//Make a variable for the start coordinates of the current slot (shorter in the if)
-					var slotCoordinates = inventory.slotCoordinates[inventory.content[i].stack.slot];
-					/*Check if the Mouse is over the slot
-					 >= to start coordinates
-					 <= to start coordinates + the scaled size of the slot */
-					if (event.offsetX >= slotCoordinates.x && 
-						event.offsetY >= slotCoordinates.y &&
-						event.offsetX <= slotCoordinates.x + 16 * inventory.scale &&
-						event.offsetY <= slotCoordinates.y + 16 * inventory.scale)
+					for (i in inventory[cntnt[c]])
 					{
-						//Mouse is over a filled slot
-						overSlot = true;
-						//Change Tool-Tip to the item's name
-						infoBox.children.infoBoxText.innerHTML = inventory.content[i].stack.itemName;
-						//Make the background fit the new Text
-						infoBox.children.infoBoxTextureMiddle.style.setAttribute("width", (infoBox.children.infoBoxText.offsetWidth - 8) + "px");
-						infoBox.children.infoBoxTextureRight.style.setAttribute("left", (infoBox.children.infoBoxText.offsetWidth - 4) + "px");
-						//Make the Tool-Tip visible and move it to the Mouse (not exactly to it, so it doesn't flicker when you move the mouse in that direction)
-						infoBox.style.setAttribute("left", (event.x + 6) + "px");
-						infoBox.style.setAttribute("top", (event.y + 6) +"px");
-						infoBox.style.setAttribute("visibility", "visible");
+						//Make a variable for the start coordinates of the current slot (shorter in the if)
+						var slotCoordinates = inventory.slotCoordinates[inventory[cntnt[c]][i].stack.slot];
+						/*Check if the Mouse is over the slot
+						 >= to start coordinates
+						 <= to start coordinates + the scaled size of the slot */
+						if (event.offsetX >= slotCoordinates.x && 
+							event.offsetY >= slotCoordinates.y &&
+							event.offsetX <= slotCoordinates.x + 16 * inventory.scale &&
+							event.offsetY <= slotCoordinates.y + 16 * inventory.scale)
+						{
+							//Mouse is over a filled slot
+							overSlot = true;
+							//Change Tool-Tip to the item's name
+							infoBox.children.infoBoxText.innerHTML = inventory[cntnt[c]][i].stack.itemName;
+							if (useFunction)
+							{
+								//Make the background fit the new Text
+								infoBox.children.infoBoxTextureMiddle.style.setAttribute("width", (infoBox.children.infoBoxText.offsetWidth - 8) + "px");
+								infoBox.children.infoBoxTextureRight.style.setAttribute("left", (infoBox.children.infoBoxText.offsetWidth - 4) + "px");
+								//Make the Tool-Tip visible and move it to the Mouse (not exactly to it, so it doesn't flicker when you move the mouse in that direction)
+								infoBox.style.setAttribute("left", (event.pageX + 10) + "px");
+								infoBox.style.setAttribute("top", (event.pageY - 38) + "px");
+								infoBox.style.setAttribute("visibility", "visible");
+							}
+							else
+							{
+								//Make the background fit the new Text
+								infoBox.children.infoBoxTextureMiddle.style.setProperty("width", (infoBox.children.infoBoxText.offsetWidth - 8) + "px");
+								infoBox.children.infoBoxTextureRight.style.setProperty("left", (infoBox.children.infoBoxText.offsetWidth - 4) + "px");
+								//Make the Tool-Tip visible and move it to the Mouse (not exactly to it, so it doesn't flicker when you move the mouse in that direction)
+								infoBox.style.setProperty("left", (event.pageX + 10) + "px");
+								infoBox.style.setProperty("top", (event.pageY - 38) + "px");
+								infoBox.style.setProperty("visibility", "visible");
+							}
+						}
 					}
 				}
 				//If the Mouse is not over a filled slot, hide the Tool-Tip
 				if(!overSlot)
 				{
-					infoBox.style.setAttribute("visibility", "hidden");
+					hideInfoBox();
 				}
 			};
 			//Function to hide the Tool-Tip when the Mouse leaves the canvas for the inventory
-			hideInfoBox = function(which)
+			hideInfoBox = function()
 			{
-				document.getElementById("infoBox").style.setAttribute("visibility", "hidden");
+				if (useFunction)
+				{
+					document.getElementById("infoBox").style.setAttribute("visibility", "hidden");
+				}
+				else
+				{
+					document.getElementById("infoBox").style.setProperty("visibility", "hidden");
+				}
 			};
 			
-			updateSettings = function(formV)
+			updateSettings = function(scale)
 			{
-				console.log(formV.elements.scale.value);
-				inventory.setScale(parseFloat(formV.elements.scale.value));
+				console.log(scale.value);
+				inventory.setScale(parseFloat(scale.value));
 			};
 		</script>
 	</head>
 	<body>
 		<h1 style="margin-left:auto; margin-right:auto; width:50%; text-align:center; border-bottom-style:solid; border-bottom-width:2px; border-bottom-color:#000000;">Banane9's InvScan Page</h1>
-		<div align="center">
-			<div>
-			<form name="player" onchange="updatePlayer(this);" action="" style="display:inline;">
-				<select name="playerName" size="1">
+		<div style ="margin-left:auto; margin-right:auto; text-align:center;">
+			<span style="display:block;">
+				<select id="playerName" name="playerName" size="1" onchange="updatePlayer(this);" style="display:inline;">
 					<option selected="selected">Choose a Player</option>
 				</select>
-			</form>
-			<form name="settings" onchange="updateSettings(this);" action="" style="display:inline; margin-left:30px;">
-				Scale: <input type="text" name="scale" size="3" maxlength="2" value="1">
-			</form>
-			</div>
-			<canvas id="inventory" align="center" onmousemove="e = event; displayInfoFor(event);" onmouseout="hideInfoBox();">
+				<span style="display:inline; margin-left:30px;">Scale: <input type="text" id="scale" name="scale" size="3" maxlength="2" value="1" onchange="updateSettings(this);"/></span>
+			</span>
+			<canvas id="inventory" onmousemove="e = event; displayInfoFor(event);" onmouseout="hideInfoBox();">
 				<p>Please use a browser that supports the HTML5 Canvas Element!</p>
 			</canvas>
+			<br/><br/>
+			<a href="http://validator.w3.org/check?uri=http%3A%2F%2Fsp.svennp.com%2Finvscan%2Findex.html" style="margin-top:30px;">Valid HTML5</a>
 		</div>
 		<div id="infoBox" style="visibility:hidden; position:absolute; color:#F0F0F0; padding:0px;">
-			<img id="infoBoxTextureLeft" src="./texture/tooltip-left.png" width="4" height="30" style="width:4px; height:30px; position:absolute; top:0px; left:0px;"/>
-			<img id="infoBoxTextureMiddle" src="./texture/tooltip-middle.png" style="width:auto; height:30px; position:absolute; top:0px; left:4px;"/>
-			<img id="infoBoxTextureRight" src="./texture/tooltip-right.png" style="width:4px; height:30px; position:absolute; left:5px; top:0px;"/>
+			<img id="infoBoxTextureLeft" src="./texture/tooltip-left.png" width="4" height="30" style="width:4px; height:30px; position:absolute; top:0px; left:0px;" alt="Tool-Tip Left"/>
+			<img id="infoBoxTextureMiddle" src="./texture/tooltip-middle.png" style="width:auto; height:30px; position:absolute; top:0px; left:4px;" alt="Tool-Tip Middle"/>
+			<img id="infoBoxTextureRight" src="./texture/tooltip-right.png" style="width:4px; height:30px; position:absolute; left:5px; top:0px;" alt="Tool-Tip Right"/>
 			<span id="infoBoxText" style="position:absolute; top:0px; left:0px; padding:6px; white-space:nowrap;">Test</span>
 		</div>
-		<script language="JavaScript">
+		<script>
+			//Check style modification
+			useFunction = false;
+			if (document.body.style.setAttribute)
+			{
+				useFunction = true;
+			}
+			
 			inventory = new mcInventory("inventory", 1, "", []);
 			
 			addOptions = function(response)
@@ -110,7 +144,7 @@
 				
 				if (players != null && players != {})
 				{
-					var playerSelect = document.forms.player.elements.playerName;
+					var playerSelect = document.getElementById("playerName");
 					for (i in players)
 					{
 						var option = document.createElement("option");
@@ -129,8 +163,10 @@
 						addOptions(this.responseText);
 					}
 				};
-				xmlhttp.open("GET", "./php/getPlayerNames.php");
+				xmlhttp.open("GET", "http://sp.svennp.com/invscan/php/getPlayerNames.php");
 				xmlhttp.send();
+			
+			setInterval(function() { inventory.drawAnimatedContent(); }, 100);
 		</script>
 	</body>
 </html>

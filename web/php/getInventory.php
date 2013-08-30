@@ -13,6 +13,11 @@ if(isset($_GET['name']))
 		{
 			$stack["itemRawName"] = "unknown";
 		}
+		
+		if (!$stack["animation"] = file("../texture/".$stack["itemRawName"].".txt"))
+		{
+			$stack["animation"] = array();
+		}
 		$toSend[$i] = $stack;
 	}
 	echo json_encode($toSend);
