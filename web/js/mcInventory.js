@@ -175,7 +175,7 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 				image.stack = nContent[i];
 				image.onload = function() { this.parent.loadCountDown.decrement(); };
 				image.src = "http://sp.svennp.com/invscan/texture/" + nContent[i].itemRawName + ".png";
-			if (nContent[i].animation != null)
+			if (nContent[i].animation != null && nContent[i].animation != [])
 			{
 				image.animation = parseAnimation(nContent[i].animation);
 				nAnimatedContentArray[nAnimatedContentArray.length] = image;
