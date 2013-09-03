@@ -1,30 +1,3 @@
-//CountDown object, might use the update function for the onload of every picture and redraw it every time
-countDown = function(times, onDone)
-{
-	this.times = times;
-	this.current = times;
-	this.complete = false;
-	this.onDone = onDone;
-	this.decrement = function()
-	{
-		this.current--;
-		if (this.current <= 0)
-		{
-			this.onDone();
-			this.complete = true;
-		}
-	};
-	this.reset = function(nTimes)
-	{
-		if (nTimes != null)
-		{
-			this.times = nTimes;
-		}
-		this.current = this.times;
-		this.complete = false;
-	};
-};
-
 parseAnimation = function(animationInfo)
 {
 	var animation = {frames: []};
@@ -32,7 +5,7 @@ parseAnimation = function(animationInfo)
 	for (i in animationInfo)
 	{
 		//Check if the object has a split method (only if it's a string)
-		if (animationInfo[i].split)
+		if (animationInfo[i].split != null)
 		{
 			//Split the string into 2 parts. first one is the frame number, next the duration, default duration is 1. format (frameNo[*duration])
 			var info = animationInfo[i].split("*");
@@ -79,50 +52,62 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 	
 	this.drawSkin = function()
 	{
-		//drawImage(image, src_start_x, src_start_y, src_size_x, src_size_y, dest_start_x, dest_start_y, dest_size_x, dest_size_y);
-		//draw the head
-		this.context.drawImage(this.skinImage, 8, 8,  8, 8, 48 * this.scale, 27 * this.scale, 8 * this.scale, 8 * this.scale);
-		//draw the body
-		this.context.drawImage(this.skinImage, 20, 20, 8, 12, 48 * this.scale, 35 * this.scale, 8 * this.scale, 12 * this.scale);
-		//draw the left leg
-		this.context.drawImage(this.skinImage, 4,  20, 4, 12, 48 * this.scale, 47 * this.scale, 4 * this.scale, 12 * this.scale);
-		//draw the right leg
-		this.context.drawImage(this.skinImage, 4,  20, 4, 12, 52 * this.scale, 47 * this.scale, 4 * this.scale, 12 * this.scale);
-		//draw the left arm
-		this.context.drawImage(this.skinImage, 44, 20, 4, 12, 44 * this.scale, 35 * this.scale, 4 * this.scale, 12 * this.scale);
-		//draw the right arm
-		this.context.drawImage(this.skinImage, 52, 20, 4, 12, 56 * this.scale, 35 * this.scale, 4 * this.scale, 12 * this.scale);
+		if (this.skinImage.complete)
+		{
+			//drawImage(image, src_start_x, src_start_y, src_size_x, src_size_y, dest_start_x, dest_start_y, dest_size_x, dest_size_y);
+			//draw the head
+			this.context.drawImage(this.skinImage, 8, 8,  8, 8, 48 * this.scale, 27 * this.scale, 8 * this.scale, 8 * this.scale);
+			//draw the body
+			this.context.drawImage(this.skinImage, 20, 20, 8, 12, 48 * this.scale, 35 * this.scale, 8 * this.scale, 12 * this.scale);
+			//draw the left leg
+			this.context.drawImage(this.skinImage, 4,  20, 4, 12, 48 * this.scale, 47 * this.scale, 4 * this.scale, 12 * this.scale);
+			//draw the right leg
+			this.context.drawImage(this.skinImage, 4,  20, 4, 12, 52 * this.scale, 47 * this.scale, 4 * this.scale, 12 * this.scale);
+			//draw the left arm
+			this.context.drawImage(this.skinImage, 44, 20, 4, 12, 44 * this.scale, 35 * this.scale, 4 * this.scale, 12 * this.scale);
+			//draw the right arm
+			this.context.drawImage(this.skinImage, 52, 20, 4, 12, 56 * this.scale, 35 * this.scale, 4 * this.scale, 12 * this.scale);
+		}
 	};
 	
 	this.drawContent = function()
 	{
-		//Draw Inventory Image, to scale
-		this.context.drawImage(this.inventoryImage, 0, 0, 176 * this.scale, 166 * this.scale);
+		if (this.inventoryImage.complete)
+		{
+			//Draw Inventory Image, to scale
+			this.context.drawImage(this.inventoryImage, 0, 0, 176 * this.scale, 166 * this.scale);
+		}
 		//Loop through all the filled slots and draw their image at the slot's coordinates; to scale
 		for (i in this.content)
 		{
-			this.context.drawImage(this.content[i], this.slotCoordinates[this.content[i].stack.slot].x, this.slotCoordinates[this.content[i].stack.slot].y, 16 * this.scale, 16 * this.scale);
+			if (this.content[i].complete)
+			{
+				this.context.drawImage(this.content[i], this.slotCoordinates[this.content[i].stack.slot].x, this.slotCoordinates[this.content[i].stack.slot].y, 16 * this.scale, 16 * this.scale);
+			}
 		}
 	};
 	
-	this.drawAnimatedContent = function()
+	this.drawAnimatedContent = function(ignore)
 	{
-		if (this.loadCountDown.complete)
+		for (i in this.animatedContent)
 		{
-			for (i in this.animatedContent)
+			if (this.animatedContent[i].complete)
 			{
-				//Increment the duration of the current frame
-				this.animatedContent[i].animation.currentFrameDuration++;
-				//If the duration is (higher or) equal to the duration it should stay, go draw the next frame and go to the next one
-				if (this.animatedContent[i].animation.currentFrameDuration >= this.animatedContent[i].animation.frames[this.animatedContent[i].animation.currentFrame].duration)
+				if (!ignore)
 				{
-					//Increment the currentFrame or revert it to the first when at the end
-					this.animatedContent[i].animation.currentFrame = (this.animatedContent[i].animation.currentFrame + 1) % this.animatedContent[i].animation.frames.length;
-					this.animatedContent[i].animation.currentFrameDuration = 0;
-					//drawImage(image, src_start_x, src_start_y, src_size_x, src_size_y, dest_start_x, dest_start_y, dest_size_x, dest_size_y);
-					//draw the new frame to the canvas
-					this.context.drawImage(this.animatedContent[i], 0, 16 + 16 * this.animatedContent[i].animation.currentFrame, 16, 16, this.slotCoordinates[this.animatedContent[i].stack.slot].x, this.slotCoordinates[this.animatedContent[i].stack.slot].y, 16 * this.scale, 16 * this.scale);
+					//Increment the duration of the current frame
+					this.animatedContent[i].animation.currentFrameDuration++;
+					//If the duration is (higher or) equal to the duration it should stay, go draw the next frame and go to the next one
+					if (this.animatedContent[i].animation.currentFrameDuration >= this.animatedContent[i].animation.frames[this.animatedContent[i].animation.currentFrame].duration)
+					{
+						//Increment the currentFrame or revert it to the first when at the end
+						this.animatedContent[i].animation.currentFrame = (this.animatedContent[i].animation.currentFrame + 1) % this.animatedContent[i].animation.frames.length;
+						this.animatedContent[i].animation.currentFrameDuration = 0;
+					}
 				}
+				//draw the new frame to the canvas
+				//drawImage(image, src_start_x, src_start_y, src_size_x, src_size_y, dest_start_x, dest_start_y, dest_size_x, dest_size_y);
+				this.context.drawImage(this.animatedContent[i], 0, 16 + 16 * this.animatedContent[i].animation.currentFrame, 16, 16, this.slotCoordinates[this.animatedContent[i].stack.slot].x, this.slotCoordinates[this.animatedContent[i].stack.slot].y, 16 * this.scale, 16 * this.scale);
 			}
 		}
 	};
@@ -189,16 +174,16 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 		//new empty arrays for the new content(s)
 		var nContentArray = [];
 		var nAnimatedContentArray = [];
-		this.loadCountDown.reset(nContent.length);
+		//Loop through the stack-objects in the received array
 		for (i in nContent)
 		{
 			nContent[i].slot--;
 			var image = new Image();
 				image.parent = this;
 				image.stack = nContent[i];
-				image.onload = function() { this.parent.loadCountDown.decrement(); };
+				image.onload = function() { this.parent.update(); };
 				image.src = "http://sp.svennp.com/invscan/texture/" + nContent[i].itemRawName + ".png";
-			if (nContent[i].animation != "")
+			if (nContent[i].animation != null && nContent[i].animation != "")
 			{
 				image.animation = parseAnimation(nContent[i].animation);
 				nAnimatedContentArray[nAnimatedContentArray.length] = image;
@@ -215,12 +200,10 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 	this.update = function()
 	{
 		this.drawContent();
+		this.drawAnimatedContent(true);
 		this.drawSkin();
 	};
 	
-	this.loadCountDown = new countDown(1);
-		this.loadCountDown.parent = this;
-		this.loadCountDown.onDone = function() { this.parent.update(); };
 	this.canvas = document.getElementById(canvasId);
 		this.canvas.width = 176 * scale;
 		this.canvas.height = 166 * scale;
