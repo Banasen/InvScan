@@ -1,3 +1,4 @@
+//CountDown object, might use the update function for the onload of every picture and redraw it every time
 countDown = function(times, onDone)
 {
 	this.times = times;
@@ -26,15 +27,27 @@ countDown = function(times, onDone)
 
 parseAnimation = function(animationInfo)
 {
-	var animation = {frames: [], currentFrame: 0, currentFrameDuration: 0};
+	var animation = {frames: []};
+	//Each line is a string in the Array
 	for (i in animationInfo)
 	{
-		var info = animationInfo[i].split("*");
-		if (info[0] != "")
+		//Check if the object has a split method (only if it's a string)
+		if (animationInfo[i].split)
 		{
-			animation.frames[animation.frames.length] = {sprite: info[0], duration: info[1] != null && info[1] != "" ? info[1] : 1};
+			//Split the string into 2 parts. first one is the frame number, next the duration, default duration is 1. format (frameNo[*duration])
+			var info = animationInfo[i].split("*");
+			//Frame number is zero-indexed
+			if (parseInt(info[0]) >= 0)
+			{
+				//Add the frame to the array. if the duration is set in the info, use that, otherwise default to 1
+				animation.frames[animation.frames.length] = {sprite: parseInt(info[0]), duration: parseInt(info[1]) >= 0 ? parseInt(info[1]) : 1};
+			}
 		}
 	}
+	//Make it start with the first frame of the animation (matters for long duration animations)
+	animation.currentFrame = animation.frames.length - 1; //Set the currentFrame to the last frame in the animation
+	animation.currentFrameDuration = animation.frames[animation.currentFrame].duration - 1; //Set the current frame duration to the last before it's over
+	
 	return animation;
 };
 
@@ -85,7 +98,7 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 	{
 		//Draw Inventory Image, to scale
 		this.context.drawImage(this.inventoryImage, 0, 0, 176 * this.scale, 166 * this.scale);
-		//Loop through all the filled slots and draw their image at the slot's coordinates, to scale
+		//Loop through all the filled slots and draw their image at the slot's coordinates; to scale
 		for (i in this.content)
 		{
 			this.context.drawImage(this.content[i], this.slotCoordinates[this.content[i].stack.slot].x, this.slotCoordinates[this.content[i].stack.slot].y, 16 * this.scale, 16 * this.scale);
@@ -107,6 +120,7 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 					this.animatedContent[i].animation.currentFrame = (this.animatedContent[i].animation.currentFrame + 1) % this.animatedContent[i].animation.frames.length;
 					this.animatedContent[i].animation.currentFrameDuration = 0;
 					//drawImage(image, src_start_x, src_start_y, src_size_x, src_size_y, dest_start_x, dest_start_y, dest_size_x, dest_size_y);
+					//draw the new frame to the canvas
 					this.context.drawImage(this.animatedContent[i], 0, 16 + 16 * this.animatedContent[i].animation.currentFrame, 16, 16, this.slotCoordinates[this.animatedContent[i].stack.slot].x, this.slotCoordinates[this.animatedContent[i].stack.slot].y, 16 * this.scale, 16 * this.scale);
 				}
 			}
@@ -115,24 +129,32 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 	
 	this.setScale = function(nScale)
 	{
+		//If the new scale is different from the old, change it
 		if (nScale != this.scale)
 		{
 			this.scale = nScale;
+			//Make new slot coordinates for the new scale
 			this.slotCoordinates = this.getSlotCoordinates(nScale);
+			//Change the canvas dimensions to fit
 			this.canvas.width = 176 * nScale;
 			this.canvas.height = 166 * nScale;
+			//Call the update function so it gets redrawn
 			this.update();
 		}
 	};
 	
 	this.setPlayerName = function(name)
 	{
+		//If the new name is different from the old, change it
 		if (name != this.playerName)
 		{
 			this.playerName = name;
+			//Get the inventory for the player
 			this.getInventoryFor(name);
+			//Make the new skinURL and modify the image's url
 			this.skinURL = "http://minecraft.net/skin/" + name + ".png";
 			this.skinImage.src = this.skinURL;
+			//The update function will be called by the skin image loading and the new inventory images.
 		}
 	};
 	
@@ -164,6 +186,7 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 	
 	this.setContent = function(nContent)
 	{
+		//new empty arrays for the new content(s)
 		var nContentArray = [];
 		var nAnimatedContentArray = [];
 		this.loadCountDown.reset(nContent.length);
@@ -195,7 +218,7 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 		this.drawSkin();
 	};
 	
-	this.loadCountDown = new countDown(40);
+	this.loadCountDown = new countDown(1);
 		this.loadCountDown.parent = this;
 		this.loadCountDown.onDone = function() { this.parent.update(); };
 	this.canvas = document.getElementById(canvasId);

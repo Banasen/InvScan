@@ -94,30 +94,49 @@
 			
 			updateSettings = function(scale)
 			{
-				console.log(scale.value);
+				console.log(scale);
 				inventory.setScale(parseFloat(scale.value));
 			};
 		</script>
 	</head>
 	<body>
-		<h1 style="margin-left:auto; margin-right:auto; width:50%; text-align:center; border-bottom-style:solid; border-bottom-width:2px; border-bottom-color:#000000;">Banane9's InvScan Page</h1>
+		<!-- Heading -->
+		<h1 style="margin-left:auto; margin-right:auto; width:33%; text-align:center; border-bottom-style:solid; border-bottom-width:2px; border-bottom-color:#000000;">InvScan</h1>
+		<!-- Text block for the settings and canvas -->
 		<div style ="margin-left:auto; margin-right:auto; text-align:center;">
 			<span style="display:block;">
+				<!-- Select box for the player -->
 				<select id="playerName" name="playerName" size="1" onchange="updatePlayer(this);" style="display:inline;">
 					<option selected="selected">Choose a Player</option>
 				</select>
-				<span style="display:inline; margin-left:30px;">Scale: <input type="text" id="scale" name="scale" size="3" maxlength="2" value="1" onchange="updateSettings(this);"/></span>
+				<!-- Select box for the scale -->
+				<span style="display:inline; margin-left:30px;">Scale: 
+					<select id="scale" name="scale" size="1" onchange="inventory.setScale(parseFloat(this.value));">
+						<option selected="selected">1</option>
+						<option>2</option>
+						<option>3</option>
+						<option>4</option>
+						<option>5</option>
+						<option>6</option>
+					</select>
+				</span>
 			</span>
+			<!-- The canvas, with message for browsers not supporting it -->
 			<canvas id="inventory" onmousemove="e = event; displayInfoFor(event);" onmouseout="hideInfoBox();">
 				<p>Please use a browser that supports the HTML5 Canvas Element!</p>
 			</canvas>
-			<br/><br/>
+			<br/>
+			<br/>
+			<!-- Link to the w3 validator [Valid HTML5] -->
 			<a href="http://validator.w3.org/check?uri=http%3A%2F%2Fsp.svennp.com%2Finvscan%2Findex.html" style="margin-top:30px;">Valid HTML5</a>
 		</div>
+		<!-- block for the tool-tip info box -->
 		<div id="infoBox" style="visibility:hidden; position:absolute; color:#F0F0F0; padding:0px;">
+			<!-- The three pictures making up the background of the tool-tip -->
 			<img id="infoBoxTextureLeft" src="./texture/tooltip-left.png" width="4" height="30" style="width:4px; height:30px; position:absolute; top:0px; left:0px;" alt="Tool-Tip Left"/>
 			<img id="infoBoxTextureMiddle" src="./texture/tooltip-middle.png" style="width:auto; height:30px; position:absolute; top:0px; left:4px;" alt="Tool-Tip Middle"/>
 			<img id="infoBoxTextureRight" src="./texture/tooltip-right.png" style="width:4px; height:30px; position:absolute; left:5px; top:0px;" alt="Tool-Tip Right"/>
+			<!-- Actual tool-tip text -->
 			<span id="infoBoxText" style="position:absolute; top:0px; left:0px; padding:6px; white-space:nowrap;">Test</span>
 		</div>
 		<script>
