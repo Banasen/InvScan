@@ -133,13 +133,32 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 		//If the new name is different from the old, change it
 		if (name != this.playerName)
 		{
-			this.playerName = name;
+			//Cache current inventory if it's not yet
+			if (this.cachedInventories[this.playerName] == null)
+			{
+				this.cachedInventories[this.playerName] = {content: this.content, animatedContent: this.animatedContent, skinImage: this.skinImage};
+			}
+			
 			//Get the inventory for the player
-			this.getInventoryFor(name);
-			//Make the new skinURL and modify the image's url
-			this.skinURL = "http://minecraft.net/skin/" + name + ".png";
+			if (this.cachedInventories[name] == null)
+			{
+				//Request from server if it's not in the cache
+				this.getInventoryFor(name);
+			}
+			else
+			{
+				//Load it from the cache
+				this.skinImage = this.cachedInventories[name].skinImage;
+				this.content = this.cachedInventories[name].content;
+				this.animatedContent = this.cachedInventories[name].animatedContent;
+			}
+			//Set the player name
+			this.playerName = name;
+			//Make the new skinURL
+			this.skinURL = "http://s3.amazonaws.com/MinecraftSkins/" + name + ".png";
 			this.skinImage.src = this.skinURL;
-			//The update function will be called by the skin image loading and the new inventory images.
+			//Call the update function
+			this.update();
 		}
 	};
 	
@@ -164,7 +183,7 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 				}
 			};
 			//Set the request url to the getInventory.php
-			xmlhttp.open("GET", "http://sp.svennp.com/invscan/php/getInventory.php?name=" + name);
+			xmlhttp.open("GET", "http://sp.svennp.com/invscan/php/getInventory.php?name=" + name + "&time=" + new Date().getTime());
 			//Send the request
 			xmlhttp.send();
 	};
@@ -204,16 +223,19 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 		this.drawSkin();
 	};
 	
+	name = name.toString() != "" ? name : "char";
+	
+	this.cachedInventories = {};
 	this.canvas = document.getElementById(canvasId);
 		this.canvas.width = 176 * scale;
 		this.canvas.height = 166 * scale;
 	this.context = this.canvas.getContext("2d");
-	this.scale = scale;
-	this.content = content;
-	this.animatedContent = animatedContent;
+	this.scale = parseFloat(scale).toString() != "NaN" ? parseFloat(scale) : 1;
+	this.content = content != null ? content : [];
+	this.animatedContent = animatedContent != null ? animatedContent : [];
 	this.slotCoordinates = this.getSlotCoordinates(scale);
 	this.playerName = name;
-	this.skinURL = "http://minecraft.net/images/char.png";
+	this.skinURL = "http://s3.amazonaws.com/MinecraftSkins/" + name + ".png";
 	this.skinImage = new Image();
 		this.skinImage.parent = this;
 		this.skinImage.onload = function() { this.parent.update(); };
@@ -221,5 +243,5 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 	this.inventoryImage = new Image();
 		this.inventoryImage.parent = this;
 		this.inventoryImage.onload = function() { this.parent.update(); };
-		this.inventoryImage.src = "./texture/inventory.png";
+		this.inventoryImage.src = "http://sp.svennp.com/invscan/texture/inventory.png";
 }

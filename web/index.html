@@ -91,6 +91,20 @@
 					document.getElementById("infoBox").style.setProperty("visibility", "hidden");
 				}
 			};
+			
+			clearCache = function()
+			{
+				var playerSelect = document.getElementById("playerName");
+				//Set inventory to Steve ("char")
+				playerSelect.selectedIndex = 0;
+				inventory.setPlayerName("char");
+				//Clear the cachedInventories object
+				inventory.cachedInventories = {};
+				//Remove all the players from the select box
+				playerSelect.innerHTML = '<option selected="selected" value="char">Choose a Player</option>';
+				//Get the new list
+				getOptions();
+			}
 		</script>
 	</head>
 	<body>
@@ -99,9 +113,11 @@
 		<!-- Text block for the settings and canvas -->
 		<div style ="margin-left:auto; margin-right:auto; text-align:center;">
 			<span style="display:block;">
+				<!-- Clear cache button -->
+				<input type="button" name="clear" id="clear" value="Clear cache!" onclick="clearCache()" style="display:inline;"/>
 				<!-- Select box for the player -->
-				<select id="playerName" name="playerName" size="1" onchange="updatePlayer(this);" style="display:inline;">
-					<option selected="selected">Choose a Player</option>
+				<select id="playerName" name="playerName" size="1" onchange="updatePlayer(this);" style="display:inline; margin-left:30px;">
+					<option selected="selected" value="char">Choose a Player</option>
 				</select>
 				<!-- Select box for the scale -->
 				<span style="display:inline; margin-left:30px;">Scale: 
@@ -127,7 +143,7 @@
 		<!-- block for the tool-tip info box -->
 		<div id="infoBox" style="visibility:hidden; position:absolute; color:#F0F0F0; padding:0px;">
 			<!-- The three pictures making up the background of the tool-tip -->
-			<img id="infoBoxTextureLeft" src="./texture/tooltip-left.png" width="4" height="30" style="width:4px; height:30px; position:absolute; top:0px; left:0px;" alt="Tool-Tip Left"/>
+			<img id="infoBoxTextureLeft" src="./texture/tooltip-left.png" style="width:4px; height:30px; position:absolute; top:0px; left:0px;" alt="Tool-Tip Left"/>
 			<img id="infoBoxTextureMiddle" src="./texture/tooltip-middle.png" style="width:auto; height:30px; position:absolute; top:0px; left:4px;" alt="Tool-Tip Middle"/>
 			<img id="infoBoxTextureRight" src="./texture/tooltip-right.png" style="width:4px; height:30px; position:absolute; left:5px; top:0px;" alt="Tool-Tip Right"/>
 			<!-- Actual tool-tip text -->
@@ -141,19 +157,11 @@
 				useFunction = true;
 			}
 			
-			inventory = new mcInventory("inventory", 1, "", []);
+			inventory = new mcInventory("inventory", 1, "", [], []);
 			
 			addOptions = function(response)
 			{
-				var players = {}
-				if (JSON != null)
-				{
-					players = JSON.parse(response);
-				}
-				else
-				{
-					players = eval(response);
-				}
+				var players = JSON.parse(response);
 				
 				if (players != null && players != {})
 				{
@@ -161,24 +169,28 @@
 					for (i in players)
 					{
 						var option = document.createElement("option");
-						option.text = players[i].playerName;
-						option.value = players[i].playerName;
+						option.text = players[i];
+						option.value = players[i];
 						playerSelect.add(option);
 					}
 				}
 			};
 			
-			xmlhttp = new XMLHttpRequest(addOptions);
-				xmlhttp.onreadystatechange = function()
-				{
-					if (this.readyState == this.DONE && this.status == 200)
+			getOptions = function()
+			{
+				xmlhttp = new XMLHttpRequest(addOptions);
+					xmlhttp.onreadystatechange = function()
 					{
-						addOptions(this.responseText);
-					}
-				};
-				xmlhttp.open("GET", "http://sp.svennp.com/invscan/php/getPlayerNames.php");
-				xmlhttp.send();
+						if (this.readyState == this.DONE && this.status == 200)
+						{
+							addOptions(this.responseText);
+						}
+					};
+					xmlhttp.open("GET", "http://sp.svennp.com/invscan/php/getPlayerNames.php?time=" + new Date().getTime());
+					xmlhttp.send();
+			}
 			
+			getOptions();
 			setInterval(function() { inventory.drawAnimatedContent(); }, 100);
 		</script>
 	</body>

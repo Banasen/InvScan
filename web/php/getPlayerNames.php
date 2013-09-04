@@ -1,6 +1,11 @@
 <?php
 require_once './MySQLConnect.php';
 
-$result = $db->query('SELECT playerName FROM invscan.inventories ORDER BY playerName ASC')->fetchAll();
-echo json_encode($result);
+$stmt = $db->query('SELECT playerName FROM invscan.inventories ORDER BY playerName ASC');
+$toSend = array();
+while ($result = $stmt->fetch())
+{
+	$toSend[count($toSend)] = $result["playerName"];
+}
+echo json_encode($toSend);
 ?>
