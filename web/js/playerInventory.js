@@ -1,4 +1,4 @@
-playerInventory = function(canvasId, scale, name, content, animatedContent)
+playerInventory = function(canvasId, scale)
 {	
 	this.getSlotCoordinates = function(s)
 	{
@@ -81,7 +81,7 @@ playerInventory = function(canvasId, scale, name, content, animatedContent)
 		//Loop through all the filled slots and draw their image at the slot's coordinates; to scale
 		for (i in this.content)
 		{
-			if (this.content[i].complete)
+			if (this.content[i].complete && this.content[i].animation == null)
 			{
 				this.context.drawImage(this.content[i], this.slotCoordinates[this.content[i].stack.slot].x, this.slotCoordinates[this.content[i].stack.slot].y, 16 * this.scale, 16 * this.scale);
 			}
@@ -92,23 +92,24 @@ playerInventory = function(canvasId, scale, name, content, animatedContent)
 	{
 		for (i in this.animatedContent)
 		{
-			if (this.animatedContent[i].complete)
+			var content = this.content[this.animatedContent[i]];
+			if (content.complete)
 			{
 				if (!ignore)
 				{
 					//Increment the duration of the current frame
-					this.animatedContent[i].animation.currentFrameDuration++;
+					content.animation.currentFrameDuration++;
 					//If the duration is (higher or) equal to the duration it should stay, go draw the next frame and go to the next one
-					if (this.animatedContent[i].animation.currentFrameDuration >= this.animatedContent[i].animation.frames[this.animatedContent[i].animation.currentFrame].duration)
+					if (content.animation.currentFrameDuration >= content.animation.frames[content.animation.currentFrame].duration)
 					{
 						//Increment the currentFrame or revert it to the first when at the end
-						this.animatedContent[i].animation.currentFrame = (this.animatedContent[i].animation.currentFrame + 1) % this.animatedContent[i].animation.frames.length;
-						this.animatedContent[i].animation.currentFrameDuration = 0;
+						content.animation.currentFrame = (content.animation.currentFrame + 1) % content.animation.frames.length;
+						content.animation.currentFrameDuration = 0;
 					}
 				}
 				//draw the new frame to the canvas
 				//drawImage(image, src_start_x, src_start_y, src_size_x, src_size_y, dest_start_x, dest_start_y, dest_size_x, dest_size_y);
-				this.context.drawImage(this.animatedContent[i], 0, 16 + 16 * this.animatedContent[i].animation.currentFrame, 16, 16, this.slotCoordinates[this.animatedContent[i].stack.slot].x, this.slotCoordinates[this.animatedContent[i].stack.slot].y, 16 * this.scale, 16 * this.scale);
+				this.context.drawImage(content, 0, 16 + 16 * content.animation.currentFrame, 16, 16, this.slotCoordinates[content.stack.slot].x, this.slotCoordinates[content.stack.slot].y, 16 * this.scale, 16 * this.scale);
 			}
 		}
 	};
@@ -210,12 +211,9 @@ playerInventory = function(canvasId, scale, name, content, animatedContent)
 			if (nContent[i].animation != null && nContent[i].animation != "")
 			{
 				image.animation = parseAnimation(nContent[i].animation);
-				nAnimatedContentArray[nAnimatedContentArray.length] = image;
+				nAnimatedContentArray[nAnimatedContentArray.length] = nContentArray.length;
 			}
-			else
-			{
-				nContentArray[nContentArray.length] = image;
-			}
+			nContentArray[nContentArray.length] = image;
 		}
 		this.content = nContentArray;
 		this.animatedContent = nAnimatedContentArray;
@@ -228,18 +226,16 @@ playerInventory = function(canvasId, scale, name, content, animatedContent)
 		this.drawSkin();
 	};
 	
-	name = name.toString() != "" ? name : "char";
-	
 	this.cachedInventories = {};
 	this.scale = parseFloat(scale).toString() != "NaN" ? parseFloat(scale) : 1;
 	this.canvas = document.getElementById(canvasId);
 		this.canvas.width = 176 * this.scale;
 		this.canvas.height = 166 * this.scale;
 	this.context = this.canvas.getContext("2d");
-	this.content = content != null ? content : [];
-	this.animatedContent = animatedContent != null ? animatedContent : [];
+	this.content = [];
+	this.animatedContent = [];
 	this.slotCoordinates = this.getSlotCoordinates(this.scale);
-	this.playerName = name;
+	this.playerName = "char";
 	this.skinURL = "http://s3.amazonaws.com/MinecraftSkins/" + name + ".png";
 	this.skinImage = new Image();
 		this.skinImage.parent = this;

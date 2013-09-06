@@ -17,6 +17,11 @@ parseAnimation = function(animationInfo)
 			}
 		}
 	}
+	//If there are no frames, add a frame pointing to the first picture
+	if (animation.frames.length == 0)
+	{
+		animation.frames[0] = {sprite: 0, duration: 1000}; //Long duration, since it doesn't matter; might as well draw less often
+	}
 	//Make it start with the first frame of the animation (matters for long duration animations)
 	animation.currentFrame = animation.frames.length - 1; //Set the currentFrame to the last frame in the animation
 	animation.currentFrameDuration = animation.frames[animation.currentFrame].duration - 1; //Set the current frame duration to the last before it's over

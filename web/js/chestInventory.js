@@ -1,4 +1,4 @@
-chestInventory = function(canvasId, scale, name, content, animatedContent)
+chestInventory = function(canvasId, scale, name)
 {
 	this.getSlotCoordinates = function(slot)
 	{
@@ -56,7 +56,7 @@ chestInventory = function(canvasId, scale, name, content, animatedContent)
 		//Loop through all the filled slots and draw their image at the slot's coordinates; to scale
 		for (i in this.content)
 		{
-			if (this.content[i].complete)
+			if (this.content[i].complete && this.content[i].animation == null)
 			{
 				var coords = this.getSlotCoordinates(i);
 				this.context.drawImage(this.content[i], coords.x, coords.y, 16 * this.scale, 16 * this.scale);
@@ -68,24 +68,25 @@ chestInventory = function(canvasId, scale, name, content, animatedContent)
 	{
 		for (i in this.animatedContent)
 		{
-			if (this.animatedContent[i].complete)
+			var content = this.content[this.animatedContent[i]];
+			if (this.content.complete)
 			{
 				if (!ignore)
 				{
 					//Increment the duration of the current frame
-					this.animatedContent[i].animation.currentFrameDuration++;
+					content.animation.currentFrameDuration++;
 					//If the duration is (higher or) equal to the duration it should stay, go draw the next frame and go to the next one
-					if (this.animatedContent[i].animation.currentFrameDuration >= this.animatedContent[i].animation.frames[this.animatedContent[i].animation.currentFrame].duration)
+					if (content.animation.currentFrameDuration >= content.animation.frames[content.animation.currentFrame].duration)
 					{
 						//Increment the currentFrame or revert it to the first when at the end
-						this.animatedContent[i].animation.currentFrame = (this.animatedContent[i].animation.currentFrame + 1) % this.animatedContent[i].animation.frames.length;
-						this.animatedContent[i].animation.currentFrameDuration = 0;
+						content.animation.currentFrame = (content.animation.currentFrame + 1) % content.animation.frames.length;
+						content.animation.currentFrameDuration = 0;
 					}
 				}
 				//draw the new frame to the canvas
 				//drawImage(image, src_start_x, src_start_y, src_size_x, src_size_y, dest_start_x, dest_start_y, dest_size_x, dest_size_y);
-				var coords = this.getSlotCoordinates(i);
-				this.context.drawImage(this.animatedContent[i], 0, 16 + 16 * this.animatedContent[i].animation.currentFrame, 16, 16, coords.x, coords.y, 16 * this.scale, 16 * this.scale);
+				var coords = this.getSlotCoordinates(this.animatedContent[i]);
+				this.context.drawImage(content, 0, 16 + 16 * content.animation.currentFrame, 16, 16, coords.x, coords.y, 16 * this.scale, 16 * this.scale);
 			}
 		}
 	};
@@ -116,25 +117,20 @@ chestInventory = function(canvasId, scale, name, content, animatedContent)
 		//Loop through the stack-objects in the received array
 		for (i in nContent)
 		{
-			nContent[i].slot--;
 			var image = new Image();
 				image.parent = this;
-				image.stack = nContent[i];
 				image.onload = function() { this.parent.update(); };
 				image.src = "http://sp.svennp.com/invscan/texture/" + nContent[i].itemRawName + ".png";
 			if (nContent[i].animation != null && nContent[i].animation != "")
 			{
 				image.animation = parseAnimation(nContent[i].animation);
-				nAnimatedContentArray[nAnimatedContentArray.length] = image;
+				nAnimatedContentArray[nAnimatedContentArray.length] = nContentArray.length;
 			}
-			else
-			{
-				nContentArray[nContentArray.length] = image;
-			}
+			nContentArray[nContentArray.length] = image;
 		}
 		this.content = nContentArray;
 		this.animatedContent = nAnimatedContentArray;
-		var rows = Math.ceil((this.content.length + this.animatedContent.length) / 9);
+		var rows = Math.ceil(this.content.length / 9);
 		this.rows = rows > 0 ? rows : 1;
 		this.canvas.height = (24 + 18 * this.rows) * this.scale;
 	};
@@ -146,11 +142,12 @@ chestInventory = function(canvasId, scale, name, content, animatedContent)
 	};
 	
 	this.cachedInventories = {};
+	this.name = name != null ? name : "";
 	this.scale = parseFloat(scale).toString() != "NaN" ? parseFloat(scale) : 1;
-	this.content = content != null ? content : [];
-	this.animatedContent = animatedContent != null ? animatedContent : [];
-		var rows = Math.ceil((this.content.length + this.animatedContent.length) / 9);
-	this.rows = rows > 0 ? rows : 1;
+	this.position = {x: 0, y: -1, z: 0};
+	this.content = [];
+	this.animatedContent = [];
+	this.rows = 1;
 	this.canvas = document.getElementById(canvasId);
 		this.canvas.width = 176 * this.scale;
 		this.canvas.height = (24 + 18 * this.rows) * this.scale;

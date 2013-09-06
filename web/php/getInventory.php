@@ -1,4 +1,5 @@
 <?php
+header("Content-Type: application/json");
 require_once './MySQLConnect.php';
 
 if(isset($_GET['name']))
@@ -26,6 +27,6 @@ if(isset($_GET['name']))
 		$toSend[$i] = $stack;
 	}
 	//Encode and send
-	echo json_encode($toSend, JSON_HEX_TAG);
+	echo json_encode($toSend);
 }
 ?>

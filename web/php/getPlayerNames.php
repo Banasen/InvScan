@@ -1,4 +1,5 @@
 <?php
+header("Content-Type: application/json");
 require_once './MySQLConnect.php';
 
 $stmt = $db->query('SELECT playerName FROM invscan.inventories ORDER BY playerName ASC');
@@ -7,5 +8,5 @@ while ($result = $stmt->fetch())
 {
 	$toSend[count($toSend)] = $result["playerName"];
 }
-echo json_encode($toSend, JSON_HEX_TAG);
+echo json_encode($toSend);
 ?>

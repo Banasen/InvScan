@@ -4,7 +4,7 @@
 		<title>InvScan</title>
 		<!-- Include the inventory javascript file -->
 		<script src="./js/parseAnimation.js"></script>
-		<script src="./js/playerInventory.js"></script>
+		<script src="./js/chestInventory.js"></script>
 		<style type="text/css">
 			#inventory
 			{
@@ -15,10 +15,20 @@
 		</style>
 		<script>
 			//Function to update the player name and inventory content function when a different player is selected
-			updatePlayer = function(select)
+			updatePosition = function(formV)
 			{
-				//Get the selected login
-				inventory.setPlayerName(select.value);
+				var x = parseInt(formV.elements.x.value);
+				var y = parseInt(formV.elements.y.value);
+				var z = parseInt(formV.elements.z.value);
+				if (x.toString() != "NaN" && y.toString() != "NaN" && z.toString() != "NaN")
+				{
+					inventory.setPosition(x, y, z);
+					return true;
+				}
+				else
+				{
+					return false;
+				}
 			};
 			
 			displayInfoFor = function(event)
@@ -68,7 +78,7 @@
 					document.getElementById("infoBox").style.setProperty("visibility", "hidden");
 				}
 			};
-			
+			//Change to position stuff ...
 			clearCache = function()
 			{
 				var playerSelect = document.getElementById("playerName");
@@ -93,9 +103,12 @@
 				<!-- Clear cache button -->
 				<input type="button" name="clear" id="clear" value="Clear cache!" onclick="clearCache()" style="display:inline;"/>
 				<!-- Select box for the player -->
-				<select id="playerName" name="playerName" size="1" onchange="updatePlayer(this);" style="display:inline; margin-left:30px;">
-					<option selected="selected" value="char">Choose a Player</option>
-				</select>
+				<form name="position" id="position" style="display:inline;" submit="updatePosition(this);">
+					<span>X: <input name="x" value="0" size="6" maxlength="5"/></span>
+					<span>Y: <input name="y" value="0" size="6" maxlength="5"/></span>
+					<span>Z: <input name="z" value="0" size="6" maxlength="5"/></span>
+					<input type="submit" value="Set Position"/>
+				</form>
 				<!-- Select box for the scale -->
 				<span style="display:inline; margin-left:30px;">Scale: 
 					<select id="scale" name="scale" size="1" onchange="inventory.setScale(parseFloat(this.value));">
@@ -134,40 +147,8 @@
 				useFunction = true;
 			}
 			
-			inventory = new playerInventory("inventory", 1);
-			
-			addOptions = function(response)
-			{
-				var players = JSON.parse(response);
-				
-				if (players != null && players != {})
-				{
-					var playerSelect = document.getElementById("playerName");
-					for (i in players)
-					{
-						var option = document.createElement("option");
-						option.text = players[i];
-						option.value = players[i];
-						playerSelect.add(option);
-					}
-				}
-			};
-			
-			getOptions = function()
-			{
-				xmlhttp = new XMLHttpRequest(addOptions);
-					xmlhttp.onreadystatechange = function()
-					{
-						if (this.readyState == this.DONE && this.status == 200)
-						{
-							addOptions(this.responseText);
-						}
-					};
-					xmlhttp.open("GET", "http://sp.svennp.com/invscan/php/getPlayerNames.php?time=" + new Date().getTime());
-					xmlhttp.send();
-			}
-			
-			getOptions();
+			inventory = new chestInventory("inventory", 1, "", [], []);
+
 			setInterval(function() { inventory.drawAnimatedContent(); }, 100);
 		</script>
 	</body>
