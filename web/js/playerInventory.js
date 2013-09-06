@@ -1,30 +1,4 @@
-parseAnimation = function(animationInfo)
-{
-	var animation = {frames: []};
-	//Each line is a string in the Array
-	for (i in animationInfo)
-	{
-		//Check if the object has a split method (only if it's a string)
-		if (animationInfo[i].split != null)
-		{
-			//Split the string into 2 parts. first one is the frame number, next the duration, default duration is 1. format (frameNo[*duration])
-			var info = animationInfo[i].split("*");
-			//Frame number is zero-indexed
-			if (parseInt(info[0]) >= 0)
-			{
-				//Add the frame to the array. if the duration is set in the info, use that, otherwise default to 1
-				animation.frames[animation.frames.length] = {sprite: parseInt(info[0]), duration: parseInt(info[1]) >= 0 ? parseInt(info[1]) : 1};
-			}
-		}
-	}
-	//Make it start with the first frame of the animation (matters for long duration animations)
-	animation.currentFrame = animation.frames.length - 1; //Set the currentFrame to the last frame in the animation
-	animation.currentFrameDuration = animation.frames[animation.currentFrame].duration - 1; //Set the current frame duration to the last before it's over
-	
-	return animation;
-};
-
-mcInventory = function(canvasId, scale, name, content, animatedContent)
+playerInventory = function(canvasId, scale, name, content, animatedContent)
 {	
 	this.getSlotCoordinates = function(s)
 	{
@@ -48,7 +22,34 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 			coordinates[coordinates.length] = {x: 8 * s, y: (8 + (18 * a)) * s};
 		}
 		return coordinates;
-	}
+	};
+	
+	this.getStackAtCoordinates = function(x, y)
+	{
+		//Loop through all the filled slots
+		cntnt = ["content", "animatedContent"];
+		for (c in cntnt)
+		{
+			for (i in this[cntnt[c]])
+			{
+				//Make a variable for the start coordinates of the current slot (shorter in the if)
+				var slotCoordinates = this.slotCoordinates[this[cntnt[c]][i].stack.slot];
+				/*Check if the Mouse is over the slot
+				 >= to start coordinates
+				 <= to start coordinates + the scaled size of the slot */
+				if (x >= slotCoordinates.x && 
+					y >= slotCoordinates.y &&
+					x <= slotCoordinates.x + 16 * this.scale &&
+					y <= slotCoordinates.y + 16 * this.scale)
+				{
+					//Mouse is over a filled slot
+					return this[cntnt[c]][i].stack;
+				}
+			}
+		}
+		//If the Mouse is not over a filled slot, return false
+		return false;
+	};
 	
 	this.drawSkin = function()
 	{
@@ -114,8 +115,12 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 	
 	this.setScale = function(nScale)
 	{
+		if (parseFloat(nScale).toString() != "NaN")
+		{
+			nScale = parseFloat(nScale);
+		}
 		//If the new scale is different from the old, change it
-		if (nScale != this.scale)
+		if (nScale != this.scale && nScale > 0)
 		{
 			this.scale = nScale;
 			//Make new slot coordinates for the new scale
@@ -226,14 +231,14 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 	name = name.toString() != "" ? name : "char";
 	
 	this.cachedInventories = {};
-	this.canvas = document.getElementById(canvasId);
-		this.canvas.width = 176 * scale;
-		this.canvas.height = 166 * scale;
-	this.context = this.canvas.getContext("2d");
 	this.scale = parseFloat(scale).toString() != "NaN" ? parseFloat(scale) : 1;
+	this.canvas = document.getElementById(canvasId);
+		this.canvas.width = 176 * this.scale;
+		this.canvas.height = 166 * this.scale;
+	this.context = this.canvas.getContext("2d");
 	this.content = content != null ? content : [];
 	this.animatedContent = animatedContent != null ? animatedContent : [];
-	this.slotCoordinates = this.getSlotCoordinates(scale);
+	this.slotCoordinates = this.getSlotCoordinates(this.scale);
 	this.playerName = name;
 	this.skinURL = "http://s3.amazonaws.com/MinecraftSkins/" + name + ".png";
 	this.skinImage = new Image();
@@ -243,5 +248,5 @@ mcInventory = function(canvasId, scale, name, content, animatedContent)
 	this.inventoryImage = new Image();
 		this.inventoryImage.parent = this;
 		this.inventoryImage.onload = function() { this.parent.update(); };
-		this.inventoryImage.src = "http://sp.svennp.com/invscan/texture/inventory.png";
+		this.inventoryImage.src = "./texture/playerInventory.png";
 }

@@ -26,6 +26,6 @@ if(isset($_GET['name']))
 		$toSend[$i] = $stack;
 	}
 	//Encode and send
-	echo json_encode($toSend);
+	echo json_encode($toSend, JSON_HEX_TAG);
 }
 ?>

@@ -3,7 +3,8 @@
 	<head>
 		<title>InvScan</title>
 		<!-- Include the inventory javascript file -->
-		<script src="./js/mcInventory.js"></script>
+		<script src="./js/parseAnimation.js"></script>
+		<script src="./js/playerInventory.js"></script>
 		<style type="text/css">
 			#inventory
 			{
@@ -22,63 +23,40 @@
 			
 			displayInfoFor = function(event)
 			{
-				/*	For Canvas Text:
-					this.context.fillStyle = "#E0E0E0";
-					this.context.font = (8 * this.scale) + "px Arial";
-					this.context.fillText(text, x, y); */
-				//Variable for checking if the Mouse is actually over a filled slot
-				var overSlot = false;
 				//Get the Tool-Tip div by its Id
 				var infoBox = document.getElementById("infoBox");
-				//Loop through all the filled slots
-				cntnt = ["content", "animatedContent"];
-				for (c in cntnt)
+				var stack = inventory.getStackAtCoordinates(event.offsetX, event.offsetY);
+				console.log(stack);
+				if (stack)
 				{
-					for (i in inventory[cntnt[c]])
+					//Change Tool-Tip to the item's name
+					infoBox.children.infoBoxText.innerHTML = stack.itemName;
+					if (useFunction)
 					{
-						//Make a variable for the start coordinates of the current slot (shorter in the if)
-						var slotCoordinates = inventory.slotCoordinates[inventory[cntnt[c]][i].stack.slot];
-						/*Check if the Mouse is over the slot
-						 >= to start coordinates
-						 <= to start coordinates + the scaled size of the slot */
-						if (event.offsetX >= slotCoordinates.x && 
-							event.offsetY >= slotCoordinates.y &&
-							event.offsetX <= slotCoordinates.x + 16 * inventory.scale &&
-							event.offsetY <= slotCoordinates.y + 16 * inventory.scale)
-						{
-							//Mouse is over a filled slot
-							overSlot = true;
-							//Change Tool-Tip to the item's name
-							infoBox.children.infoBoxText.innerHTML = inventory[cntnt[c]][i].stack.itemName;
-							if (useFunction)
-							{
-								//Make the background fit the new Text
-								infoBox.children.infoBoxTextureMiddle.style.setAttribute("width", (infoBox.children.infoBoxText.offsetWidth - 8) + "px");
-								infoBox.children.infoBoxTextureRight.style.setAttribute("left", (infoBox.children.infoBoxText.offsetWidth - 4) + "px");
-								//Make the Tool-Tip visible and move it to the Mouse (not exactly to it, so it doesn't flicker when you move the mouse in that direction)
-								infoBox.style.setAttribute("left", (event.pageX + 10) + "px");
-								infoBox.style.setAttribute("top", (event.pageY - 38) + "px");
-								infoBox.style.setAttribute("visibility", "visible");
-							}
-							else
-							{
-								//Make the background fit the new Text
-								infoBox.children.infoBoxTextureMiddle.style.setProperty("width", (infoBox.children.infoBoxText.offsetWidth - 8) + "px");
-								infoBox.children.infoBoxTextureRight.style.setProperty("left", (infoBox.children.infoBoxText.offsetWidth - 4) + "px");
-								//Make the Tool-Tip visible and move it to the Mouse (not exactly to it, so it doesn't flicker when you move the mouse in that direction)
-								infoBox.style.setProperty("left", (event.pageX + 10) + "px");
-								infoBox.style.setProperty("top", (event.pageY - 38) + "px");
-								infoBox.style.setProperty("visibility", "visible");
-							}
-						}
+						//Make the background fit the new Text
+						infoBox.children.infoBoxTextureMiddle.style.setAttribute("width", (infoBox.children.infoBoxText.offsetWidth - 8) + "px");
+						infoBox.children.infoBoxTextureRight.style.setAttribute("left", (infoBox.children.infoBoxText.offsetWidth - 4) + "px");
+						//Make the Tool-Tip visible and move it to the Mouse (not exactly to it, so it doesn't flicker when you move the mouse in that direction)
+						infoBox.style.setAttribute("left", (event.pageX + 10) + "px");
+						infoBox.style.setAttribute("top", (event.pageY - 38) + "px");
+						infoBox.style.setAttribute("visibility", "visible");
+					}
+					else
+					{
+						//Make the background fit the new Text
+						infoBox.children.infoBoxTextureMiddle.style.setProperty("width", (infoBox.children.infoBoxText.offsetWidth - 8) + "px");
+						infoBox.children.infoBoxTextureRight.style.setProperty("left", (infoBox.children.infoBoxText.offsetWidth - 4) + "px");
+						//Make the Tool-Tip visible and move it to the Mouse (not exactly to it, so it doesn't flicker when you move the mouse in that direction)
+						infoBox.style.setProperty("left", (event.pageX + 10) + "px");
+						infoBox.style.setProperty("top", (event.pageY - 38) + "px");
+						infoBox.style.setProperty("visibility", "visible");
 					}
 				}
-				//If the Mouse is not over a filled slot, hide the Tool-Tip
-				if(!overSlot)
+				else
 				{
 					hideInfoBox();
 				}
-			};
+			}
 			//Function to hide the Tool-Tip when the Mouse leaves the canvas for the inventory
 			hideInfoBox = function()
 			{
@@ -157,7 +135,7 @@
 				useFunction = true;
 			}
 			
-			inventory = new mcInventory("inventory", 1, "", [], []);
+			inventory = new playerInventory("inventory", 1, "", [], []);
 			
 			addOptions = function(response)
 			{

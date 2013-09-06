@@ -7,5 +7,5 @@ while ($result = $stmt->fetch())
 {
 	$toSend[count($toSend)] = $result["playerName"];
 }
-echo json_encode($toSend);
+echo json_encode($toSend, JSON_HEX_TAG);
 ?>
