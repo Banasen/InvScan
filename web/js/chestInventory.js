@@ -120,7 +120,7 @@ chestInventory = function(canvasId, scale, name)
 			var image = new Image();
 				image.parent = this;
 				image.onload = function() { this.parent.update(); };
-				image.src = "http://sp.svennp.com/invscan/texture/" + nContent[i].itemRawName + ".png";
+				image.src = "http://sp.svennp.com/invscan/texture/" + nContent[i].rawName + ".png";
 			if (nContent[i].animation != null && nContent[i].animation != "")
 			{
 				image.animation = parseAnimation(nContent[i].animation);

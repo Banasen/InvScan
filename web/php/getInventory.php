@@ -5,7 +5,7 @@ require_once './MySQLConnect.php';
 if(isset($_GET['name']))
 {
 	//Prepare the query
-	$stmt = $db->prepare('SELECT itemRawName, itemName, slot, quantity FROM invscan.items WHERE playerName = ? ORDER BY slot ASC');
+	$stmt = $db->prepare('SELECT rawName, name, slot, quantity FROM invscan.playerItems WHERE playerName = ? ORDER BY slot ASC');
 	//Execute the query with the player name
 	$stmt->execute(array($_GET["name"]));
 	//Fetch the result
@@ -15,12 +15,12 @@ if(isset($_GET['name']))
 	foreach($result as $i => $stack)
 	{
 		//Replace not existing images by the unknown-image
-		if (!file_exists("../texture/".$stack["itemRawName"].".png"))
+		if (!file_exists("../texture/".$stack["rawName"].".png"))
 		{
-			$stack["itemRawName"] = "unknown";
+			$stack["rawName"] = "unknown";
 		}
 		//Add the animation to the stack if there's a .txt file, empty array if not
-		if (!$stack["animation"] = file("../texture/".$stack["itemRawName"].".txt"))
+		if (!$stack["animation"] = file("../texture/".$stack["rawName"].".txt"))
 		{
 			$stack["animation"] = array();
 		}

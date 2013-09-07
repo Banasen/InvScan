@@ -207,7 +207,7 @@ playerInventory = function(canvasId, scale)
 				image.parent = this;
 				image.stack = nContent[i];
 				image.onload = function() { this.parent.update(); };
-				image.src = "http://sp.svennp.com/invscan/texture/" + nContent[i].itemRawName + ".png";
+				image.src = "http://sp.svennp.com/invscan/texture/" + nContent[i].rawName + ".png";
 			if (nContent[i].animation != null && nContent[i].animation != "")
 			{
 				image.animation = parseAnimation(nContent[i].animation);
@@ -236,7 +236,7 @@ playerInventory = function(canvasId, scale)
 	this.animatedContent = [];
 	this.slotCoordinates = this.getSlotCoordinates(this.scale);
 	this.playerName = "char";
-	this.skinURL = "http://s3.amazonaws.com/MinecraftSkins/" + name + ".png";
+	this.skinURL = "http://s3.amazonaws.com/MinecraftSkins/" + this.playerName + ".png";
 	this.skinImage = new Image();
 		this.skinImage.parent = this;
 		this.skinImage.onload = function() { this.parent.update(); };
