@@ -1,4 +1,4 @@
-package io.github.alekso56.InvScanLive;
+package InvScanLive;
 
 import java.util.List;
 

@@ -1,0 +1,16 @@
+[
+ {
+  "modid": "InvScanLive",
+  "name": "InvScanLive",
+  "description": "The famous Invscan mod! scan those inventories HARD!",
+  "version": "0.1",
+  "credits": "Created by alekso56, requested by banane9",
+  "logoFile": "/InvScanLive/logo.png",
+  "mcversion": "1.5.2",
+  "url": "https://github.com/Banasen/InvScan",
+  "authors": [ "Alekso56" ],
+  "dependencies": [
+                   "mod_MinecraftForge"
+                  ]
+ }
+]

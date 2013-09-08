@@ -1,4 +1,4 @@
-package io.github.alekso56.InvScanLive;
+package InvScanLive;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -7,16 +7,26 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.Iterator;
 
-import cpw.mods.fml.common.Mod.Item;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 
 public class WebPhpPost {
-	private void PrepPost(String PlayerName,ItemStack itemstack){
+	public static void PrepPost(String PlayerName,IInventory inventory,boolean chest){
 	//item[slothere][rawName]=raw.name.here&item[slothere][name]=name here&item[slothere][size]=sizehere&
 	//convert playerinv to invscan format (copy pasta from ocs!)
+		HashMap map = invToMap(inventory);
+		Iterator<Integer> keySetIterator = map.keySet().iterator();
+
+		while(keySetIterator.hasNext()){
+		  Integer key = keySetIterator.next();
+		  System.out.println("key: " + key + " value: " + map.get(key));
+		}
 		
+		if(chest){
+			//item[slothere][id]=id&item[slothere][damage]=damagehere&item[slothere][rawName]=rawnamehere&item[slothere][name]=name&item[slothere][size]=sizehere&
+		}
 	 String toPost="?name="+PlayerName+"";
 	}
 	

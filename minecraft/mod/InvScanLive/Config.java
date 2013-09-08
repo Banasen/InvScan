@@ -1,4 +1,4 @@
-package io.github.alekso56.InvScanLive;
+package InvScanLive;
 
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.Property;
