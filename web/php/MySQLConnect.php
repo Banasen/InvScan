@@ -1,5 +1,5 @@
 <?php
-// MySQL-Data EXAMPLE
+// MySQL-Data
 $mysql_data = array(
 	"host" => "localhost",
 	"user" => "invscan",
