@@ -189,7 +189,7 @@ playerInventory = function(canvasId, scale)
 				}
 			};
 			//Set the request url to the getInventory.php
-			xmlhttp.open("GET", "http://sp.svennp.com/invscan/php/getInventory.php?name=" + name + "&time=" + new Date().getTime());
+			xmlhttp.open("GET", "http://sp.svennp.com/invscan/php/getPlayerInventory.php?name=" + name + "&time=" + new Date().getTime());
 			//Send the request
 			xmlhttp.send();
 	};

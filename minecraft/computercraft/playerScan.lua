@@ -1,7 +1,7 @@
 os.loadAPI("ocs/apis/sensor")
 proxSensor = sensor.wrap("front")
 
-baseURL = "http://sp.svennp.com/invscan/php/post.php?"
+baseURL = "http://sp.svennp.com/invscan/php/postPlayer.php?name="
 
 rs.setOutput("top", false)
 while true do
@@ -21,7 +21,7 @@ while true do
 			end
 			-- Add more info?
 			print("Starting http-request!")
-			http.request(baseURL.."name="..name, postInfo)
+			http.request(baseURL..name, postInfo)
 			completed = false
 			repeat
 				local event, url, sourceText = os.pullEvent()

@@ -31,14 +31,15 @@ USE invscan;
 --
 
 CREATE TABLE IF NOT EXISTS chestItems (
-  chestX int NOT NULL,
-  chestY int NOT NULL,
-  chestZ int NOT NULL,
-  id int NOT NULL,
-  damage int NOT NULL,
+  chestX int(11) NULL,
+  chestY int(11) NULL,
+  chestZ int(11) NULL,
+  chestName text NOT NULL,
+  id int(11) NULL,
+  damage int(11) NULL,
   rawName text NOT NULL,
   `name` text NOT NULL,
-  quantity int NOT NULL
+  quantity int(11) NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -48,12 +49,12 @@ CREATE TABLE IF NOT EXISTS chestItems (
 --
 
 CREATE TABLE IF NOT EXISTS chests (
-  x int NOT NULL,
-  y int NOT NULL,
-  z int NOT NULL,
-  playerName text NOT NULL,
+  x int(11) NULL,
+  y int(11) NULL,
+  z int(11) NULL,
+  playerName text NULL,
   `name` text NOT NULL,
-  lastUpdated int NOT NULL
+  lastUpdated TIMESTAMP(11) DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -64,12 +65,12 @@ CREATE TABLE IF NOT EXISTS chests (
 
 CREATE TABLE IF NOT EXISTS playerItems (
   playerName text NOT NULL,
-  slot int NOT NULL,
-  id int NOT NULL,
-  damage int NOT NULL,
+  slot int(11) NOT NULL,
+  id int(11) NULL,
+  damage int(11) NULL,
   rawName text NOT NULL,
   `name` text NOT NULL,
-  quantity int NOT NULL
+  quantity int(11) NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -79,11 +80,11 @@ CREATE TABLE IF NOT EXISTS playerItems (
 --
 
 CREATE TABLE IF NOT EXISTS players (
-  `name` text NOT NULL,
-  x int NOT NULL,
-  y int NOT NULL,
-  z int NOT NULL,
-  lastUpdated int NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  x int(11) NULL,
+  y int(11) NULL,
+  z int(11) NULL,
+  lastUpdated TIMESTAMP(11) DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY playerName (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
