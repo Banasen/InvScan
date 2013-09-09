@@ -91,6 +91,20 @@ chestInventory = function(canvasId, scale, name)
 		}
 	};
 	
+	this.drawName = function()
+	{
+		var str = this.name;
+		if (this.position.x != null && this.position.y != null && this.position.z != null)
+		{
+			str += " at " + this.position.x + ", " + this.position.y + ", " + this.position.z;
+		}
+		this.context.font = (8 * this.scale) + "px Arial";
+		this.context.textAlign = "center";
+		this.context.textBaseline = "middle";
+		var size = this.context.measureText(str);
+		this.context.fillText(str, 88 * this.scale, 10 * this.scale, 164 * this.scale);
+	};
+	
 	this.setScale = function(nScale)
 	{
 		if (parseFloat(nScale).toString() != "NaN")
@@ -135,16 +149,73 @@ chestInventory = function(canvasId, scale, name)
 		this.canvas.height = (24 + 18 * this.rows) * this.scale;
 	};
 	
+	this.setChestName = function(name)
+	{
+		//If the new name is different from the old, change it
+		if (name != this.name)
+		{
+			//Cache current inventory if it's not yet
+			if (this.cachedInventories[this.name] == null)
+			{
+				this.cachedInventories[this.name] = {content: this.content, animatedContent: this.animatedContent};
+			}
+			
+			//Get the inventory for the chest
+			if (this.cachedInventories[name] == null)
+			{
+				//Request from server if it's not in the cache
+				this.getInventoryFor(name);
+			}
+			else
+			{
+				//Load it from the cache
+				this.content = this.cachedInventories[name].content;
+				this.animatedContent = this.cachedInventories[name].animatedContent;
+			}
+			//Set the player name
+			this.name = name;
+			//Call the update function
+			this.update();
+		}
+	};
+	
+	this.getInventoryFor = function(name)
+	{
+		var xmlhttp = new XMLHttpRequest();
+			xmlhttp.parent = this;
+			//Set the function that calls the setContent method if it successfully completes
+			xmlhttp.onreadystatechange = function()
+			{
+				//Check if the request successfully completed
+				if (this.readyState == this.DONE && this.status == 200)
+				{
+					//Parse the JSON returned by the getInventory.php into a object
+					var content = JSON.parse(this.responseText);
+					//Check that it's not null
+					if (content != null)
+					{
+						//Update the inventory's content with the newly received
+						this.parent.setContent(content);
+					}
+				}
+			};
+			//Set the request url to the getInventory.php
+			xmlhttp.open("GET", "http://sp.svennp.com/invscan/php/getChestInventory.php?name=" + name + "&time=" + new Date().getTime());
+			//Send the request
+			xmlhttp.send();
+	};
+	
 	this.update = function()
 	{
 		this.drawContent();
 		this.drawAnimatedContent(true);
+		this.drawName();
 	};
 	
 	this.cachedInventories = {};
-	this.name = name != null ? name : "";
+	this.name = name != null ? name : "Chest";
 	this.scale = parseFloat(scale).toString() != "NaN" ? parseFloat(scale) : 1;
-	this.position = {x: 0, y: -1, z: 0};
+	this.position = {x: null, y: null, z: null};
 	this.content = [];
 	this.animatedContent = [];
 	this.rows = 1;

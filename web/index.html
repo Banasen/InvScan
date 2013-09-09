@@ -14,13 +14,6 @@
 			}
 		</style>
 		<script>
-			//Function to update the player name and inventory content function when a different player is selected
-			updatePlayer = function(select)
-			{
-				//Get the selected login
-				inventory.setPlayerName(select.value);
-			};
-			
 			displayInfoFor = function(event)
 			{
 				//Get the Tool-Tip div by its Id
@@ -93,7 +86,7 @@
 				<!-- Clear cache button -->
 				<input type="button" name="clear" id="clear" value="Clear cache!" onclick="clearCache()" style="display:inline;"/>
 				<!-- Select box for the player -->
-				<select id="playerName" name="playerName" size="1" onchange="updatePlayer(this);" style="display:inline; margin-left:30px;">
+				<select id="playerName" name="playerName" size="1" onchange="inventory.setPlayerName(this.value);" style="display:inline; margin-left:30px;">
 					<option selected="selected" value="char">Choose a Player</option>
 				</select>
 				<!-- Select box for the scale -->
@@ -165,7 +158,7 @@
 					};
 					xmlhttp.open("GET", "http://sp.svennp.com/invscan/php/getPlayers.php?time=" + new Date().getTime());
 					xmlhttp.send();
-			}
+			};
 			
 			getOptions();
 			setInterval(function() { inventory.drawAnimatedContent(); }, 100);

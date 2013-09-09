@@ -88,7 +88,7 @@
 				//Clear the cachedInventories object
 				inventory.cachedInventories = {};
 				//Remove all the players from the select box
-				playerSelect.innerHTML = '<option selected="selected" value="char">Choose a Player</option>';
+				playerSelect.innerHTML = '<option selected="selected" value=" ">Choose a Chest</option>';
 				//Get the new list
 				getOptions();
 			}
@@ -103,12 +103,9 @@
 				<!-- Clear cache button -->
 				<input type="button" name="clear" id="clear" value="Clear cache!" onclick="clearCache()" style="display:inline;"/>
 				<!-- Select box for the player -->
-				<form name="position" id="position" style="display:inline;" submit="updatePosition(this);">
-					<span>X: <input name="x" value="0" size="6" maxlength="5"/></span>
-					<span>Y: <input name="y" value="0" size="6" maxlength="5"/></span>
-					<span>Z: <input name="z" value="0" size="6" maxlength="5"/></span>
-					<input type="submit" value="Set Position"/>
-				</form>
+				<select name="chests" id="chests" onchange="inventory.setChestName(this.value);" style="display:inline;">
+					<option selected="selected" value=" ">Choose a Chest</option>
+				</select>
 				<!-- Select box for the scale -->
 				<span style="display:inline; margin-left:30px;">Scale: 
 					<select id="scale" name="scale" size="1" onchange="inventory.setScale(parseFloat(this.value));">
@@ -148,7 +145,40 @@
 			}
 			
 			inventory = new chestInventory("inventory", 1, "", [], []);
-
+			
+			addOptions = function(response)
+			{
+				var chests = JSON.parse(response);
+				
+				if (chests != null && chests != {})
+				{
+					var chestSelect = document.getElementById("chests");
+					for (i in chests)
+					{
+						var option = document.createElement("option");
+						option.text = chests[i].name + (chests[i].x != null && chests[i].y != null && chests[i].z != null ? " at " + chests[i].x + ", " + chests[i].y + ", " + chests[i].z : "");
+						option.value = chests[i].name;
+						playerSelect.add(option);
+					}
+				}
+			};
+			
+			getOptions = function()
+			{
+				xmlhttp = new XMLHttpRequest(addOptions);
+					xmlhttp.onreadystatechange = function()
+					{
+						if (this.readyState == this.DONE && this.status == 200)
+						{
+							addOptions(this.responseText);
+						}
+					};
+					xmlhttp.open("GET", "http://sp.svennp.com/invscan/php/getChests.php?time=" + new Date().getTime());
+					xmlhttp.send();
+			};
+			
+			getOptions();
+			
 			setInterval(function() { inventory.drawAnimatedContent(); }, 100);
 		</script>
 	</body>
