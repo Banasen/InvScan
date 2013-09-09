@@ -101,7 +101,6 @@ chestInventory = function(canvasId, scale, name)
 		this.context.font = (8 * this.scale) + "px Arial";
 		this.context.textAlign = "center";
 		this.context.textBaseline = "middle";
-		var size = this.context.measureText(str);
 		this.context.fillText(str, 88 * this.scale, 10 * this.scale, 164 * this.scale);
 	};
 	

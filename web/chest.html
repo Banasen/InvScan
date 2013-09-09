@@ -81,14 +81,14 @@
 			//Change to position stuff ...
 			clearCache = function()
 			{
-				var playerSelect = document.getElementById("playerName");
+				var chestSelect = document.getElementById("chests");
 				//Set inventory to Steve ("char")
-				playerSelect.selectedIndex = 0;
-				inventory.setPlayerName("char");
+				chestSelect.selectedIndex = 0;
+				inventory.setChestName(" ");
 				//Clear the cachedInventories object
 				inventory.cachedInventories = {};
 				//Remove all the players from the select box
-				playerSelect.innerHTML = '<option selected="selected" value=" ">Choose a Chest</option>';
+				chestSelect.innerHTML = '<option selected="selected" value=" ">Choose a Chest</option>';
 				//Get the new list
 				getOptions();
 			}
@@ -158,7 +158,7 @@
 						var option = document.createElement("option");
 						option.text = chests[i].name + (chests[i].x != null && chests[i].y != null && chests[i].z != null ? " at " + chests[i].x + ", " + chests[i].y + ", " + chests[i].z : "");
 						option.value = chests[i].name;
-						playerSelect.add(option);
+						chestSelect.add(option);
 					}
 				}
 			};

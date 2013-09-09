@@ -1,5 +1,5 @@
 <?php
-//SEt correct content-type header for json
+//Set correct content-type header for json
 header("Content-Type: application/json");
 require_once './MySQLConnect.php';
 
