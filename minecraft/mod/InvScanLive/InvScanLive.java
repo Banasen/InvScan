@@ -1,19 +1,15 @@
 package InvScanLive;
 
+import java.util.Iterator;
 
-import java.util.List;
-import java.util.ListIterator;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.ServerStarting;
-import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
@@ -39,21 +35,26 @@ public class InvScanLive {
 	public void serverLoad(FMLServerStartingEvent event) {
 		event.registerServerCommand(new Commands());
 	}
-	
+
 	@Mod.Init
-	public void init( FMLInitializationEvent evt ){
+	public void init(FMLInitializationEvent evt) {
 		MinecraftForge.EVENT_BUS.register(new Signs());
-		
+
 	}
-	
-	public static void uploadAllPlayerInvs(){
-	 List Players =	MinecraftServer.getServer().getConfigurationManager().playerEntityList;
-	 for (int i=0; i<Players.size(); i++)
-	 {
-	//  Minecraft.getMinecraft().thePlayer.inventory.mainInventory.);
-	//  WebPhpPost.PrepPost(Players.get(i).toString(), Players.get(i), false)
-		 System.out.println(Players.get(i));
-	  
-	 }
+
+	public static void uploadAllPlayerInvs() {
+		Iterator iterator = MinecraftServer.getServer()
+				.getConfigurationManager().playerEntityList.iterator();
+		while (iterator.hasNext()) {
+			EntityPlayerMP entityplayermp = (EntityPlayerMP) iterator.next();
+			IInventory inventory = entityplayermp.inventory;
+			String Username = entityplayermp.username;
+			WebPhpPost.PrepPost(Username, inventory, false);
+		}
+	}
+
+	public static void uploadAllChests() {
+		// something...
+		// WebPhpPost.PrepPost(PlayerName, inventory, true)
 	}
 }

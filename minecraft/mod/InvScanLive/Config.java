@@ -4,8 +4,8 @@ import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.Property;
 
 public class Config {
-	static Property ChestUP,rate; //temp
-	public static boolean DEBUG,uploadchests;
+	static Property ChestUP,rate,mkT; //temp
+	public static boolean DEBUG,uploadchests,maketexture;
 	static String connectURL;
 	static Integer Refrate; //refreshrate or 0 == false
 	
@@ -20,6 +20,9 @@ public class Config {
 		else{
 			Refrate = rate.getInt();
 		}
+		mkT = config.get("Misc", "maketexture", false);
+		mkT.comment = "Enable the texture interceptor? (make a zip after doing /isl makeT ingame)";
+		maketexture = mkT.getBoolean(true);
 		DEBUG = config.get("Misc", "DEBUG", false).getBoolean(true);
 		ChestUP = config.get("Misc", "ChestUP", false);
 		ChestUP.comment = "Upload chest contents regardless of signs?";

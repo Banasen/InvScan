@@ -16,14 +16,12 @@ public class Commands implements ICommand {
 
 	@Override
 	public String getCommandName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "isl";
 	}
 
 	@Override
 	public String getCommandUsage(ICommandSender icommandsender) {
-		// TODO Auto-generated method stub
-		return null;
+		return "/ISL ?";
 	}
 
 	@Override
@@ -34,20 +32,32 @@ public class Commands implements ICommand {
 
 	@Override
 	public void processCommand(ICommandSender icommandsender, String[] astring) {
-		// TODO Auto-generated method stub
-
+		if(astring.length == 0)
+	    {
+	      return;
+	    }
+	    if(astring[0] == "makeT" && Config.maketexture){
+	    	// compile a zip with all textures
+	    }
+	    else if(astring[0] == "Uplayers"){
+	    	InvScanLive.uploadAllPlayerInvs();
+	    }
+	    else if(astring[0] == "Uchests"){
+	    	InvScanLive.uploadAllChests();
+	    }
+	    else if(astring[0] == "?"){
+	    	icommandsender.sendChatToPlayer("ISL USAGE: makeT,Uplayers,Uchests");
+	    }
 	}
 
 	@Override
 	public boolean canCommandSenderUseCommand(ICommandSender icommandsender) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public List addTabCompletionOptions(ICommandSender icommandsender,
 			String[] astring) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
