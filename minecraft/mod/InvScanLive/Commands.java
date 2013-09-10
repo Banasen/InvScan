@@ -4,10 +4,9 @@ import java.util.List;
 
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.server.MinecraftServer;
 
 public class Commands implements ICommand {
-    //make commands to edit/delete existing uploads/reupload an inv etc..
-	// also make command to trigger MakeTexture
 	@Override
 	public int compareTo(Object arg0) {
 		// TODO Auto-generated method stub
@@ -34,25 +33,35 @@ public class Commands implements ICommand {
 	public void processCommand(ICommandSender icommandsender, String[] astring) {
 		if(astring.length == 0)
 	    {
+		  icommandsender.sendChatToPlayer("ISL USAGE: makeT,Uplayers,Uchests");
 	      return;
 	    }
-	    if(astring[0] == "makeT" && Config.maketexture){
+		String carg = astring[0].toLowerCase();
+		String upl = "uplayers";
+		String spm = "?";
+		String makt = "maket";
+	    if(carg.equals(makt) && Config.maketexture){
 	    	// compile a zip with all textures
+	    	icommandsender.sendChatToPlayer("Creating textures..... plox wait");
+	    	//invscan.createPack();
 	    }
-	    else if(astring[0] == "Uplayers"){
+	    else if(carg.equals(upl)){
 	    	InvScanLive.uploadAllPlayerInvs();
+	    	icommandsender.sendChatToPlayer("uploading all player invs!");
 	    }
-	    else if(astring[0] == "Uchests"){
+	    else if(carg.equals("uchests")){
 	    	InvScanLive.uploadAllChests();
+	    	icommandsender.sendChatToPlayer("uploading all chests!");
 	    }
-	    else if(astring[0] == "?"){
+	    else if(carg.equals(spm)){
 	    	icommandsender.sendChatToPlayer("ISL USAGE: makeT,Uplayers,Uchests");
 	    }
 	}
 
 	@Override
-	public boolean canCommandSenderUseCommand(ICommandSender icommandsender) {
-		return false;
+	public boolean canCommandSenderUseCommand(ICommandSender icommandsender) { 
+		System.out.println(MinecraftServer.getServer().getConfigurationManager().getOps().contains(icommandsender.getCommandSenderName()));
+		return true;
 	}
 
 	@Override

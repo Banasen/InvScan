@@ -14,28 +14,30 @@ import net.minecraft.item.ItemStack;
 
 public class WebPhpPost {
 	public static void PrepPost(String PlayerName,IInventory inventory,boolean chest){
-	//item[slothere][rawName]=raw.name.here&item[slothere][name]=name here&item[slothere][size]=sizehere&
-	//convert playerinv to invscan format (copy pasta from ocs!)
-		HashMap map = invToMap(inventory);
-		Iterator<Integer> keySetIterator = map.keySet().iterator();
-
-		while(keySetIterator.hasNext()){
-		  Integer key = keySetIterator.next();
-		  System.out.println("key: " + key + " value: " + map.get(key));
-		}
-		
 		if(chest){
 			//item[slothere][id]=id&item[slothere][damage]=damagehere&item[slothere][rawName]=rawnamehere&item[slothere][name]=name&item[slothere][size]=sizehere&
 		}
-	 String toPost="?name="+PlayerName+"";
+		else{
+			String toPost="?name="+PlayerName+invToMap(inventory);
+			try {
+				sendPost(toPost);
+				System.out.println(toPost);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
-	public static HashMap invToMap(IInventory inventory) {
-		HashMap map = new HashMap();
+	public static String invToMap(IInventory inventory) {
+		String output = "";
 			for (int i = 0; i < inventory.getSizeInventory(); i++) {
-				map.put(i + 1, itemstackToMap(inventory.getStackInSlot(i)));
+				HashMap map2 = itemstackToMap(inventory.getStackInSlot(i));
+				if(map2.containsValue("Air")){
+					continue;
+				}
+				  output = output + "item["+i+"][rawName]="+map2.get("RawName")+"&item["+i+"][name]="+map2.get("Name")+"item["+i+"][size]="+map2.get("Size")+"&";
 			}
-		return map;
+		return output;
 	}
 	
 	public static String getNameForItemStack(ItemStack is) {
@@ -57,21 +59,16 @@ public class WebPhpPost {
 
 		try {
 			rawName = is.getItemName().toLowerCase();
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		try {
 			if (rawName.length() - rawName.replaceAll("\\.", "").length() == 0) {
-				String packageName = is.getItem().getClass().getName()
-						.toLowerCase();
+				String packageName = is.getItem().getClass().getName().toLowerCase();
 				String[] packageLevels = packageName.split("\\.");
-				if (!rawName.startsWith(packageLevels[0])
-						&& packageLevels.length > 1) {
+				if (!rawName.startsWith(packageLevels[0])&& packageLevels.length > 1) {
 					rawName = packageLevels[0] + "." + rawName;
 				}
 			}
-		} catch (Exception e) {
-
-		}
+		} catch (Exception e) {}
 
 		return rawName.trim();
 	}
@@ -83,42 +80,38 @@ public class WebPhpPost {
 
 		if (itemstack == null) {
 
-			map.put("Name", "empty");
-			map.put("Size", 0);
-			map.put("Damagevalue", 0);
-			map.put("MaxStack", 64);
+			map.put("Name", "Air");
 			return map;
 
 		} else {
 
-			map.put("Name", getNameForItemStack(itemstack));			
+			map.put("Name", getNameForItemStack(itemstack));
 			map.put("RawName", getRawNameForStack(itemstack));
 			map.put("Size", itemstack.stackSize);
 			map.put("DamageValue", itemstack.getItemDamage());
 			map.put("MaxStack", itemstack.getMaxStackSize());
+			return map;
 		}
-
-		return map;
 	}
 	
 
-	private void sendPost(String urlParameters) throws Exception{
+	private static void sendPost(String urlParameters) throws Exception{
     //init parameters.
-		URL url = new URL(Config.connectURL);
+		URL url = new URL(Config.connectURL+"?");
 		URLConnection conn = url.openConnection();
 		String line;
-		//conn.setDoOutput(true);
+		//conn.setDoOutput(true);  response if true
     // send to webserver
 		OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
 		writer.write(urlParameters);
 		writer.flush();
-	/*
+	/*  read response??!?!
 		BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream())); 
 		while ((line = reader.readLine()) != null) {
 		    System.out.println(line);
 		}
 	*/
 		writer.close();
-	//	reader.close();  
+	//	reader.close();  close input reader
 	}
 }

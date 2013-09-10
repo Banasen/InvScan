@@ -71,7 +71,8 @@ public class Signs {
 	 */
 	// check sign contents
 	public static boolean isValidPreparedSign(String[] lines) {
-		if (lines[0].equalsIgnoreCase("INVSCAN")) {
+		String scan = "[INVSCAN]";
+		if (!lines[0].equalsIgnoreCase(scan)) {
 			return false;
 		} else if (lines[1] == "") {
 			return false;
