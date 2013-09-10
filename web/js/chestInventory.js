@@ -8,24 +8,20 @@ chestInventory = function(canvasId, scale, name)
 	this.getStackAtCoordinates = function(x, y)
 	{
 		//Loop through all the filled slots
-		cntnt = ["content", "animatedContent"];
-		for (c in cntnt)
+		for (i in this.content)
 		{
-			for (i in this[cntnt[c]])
+			//Make a variable for the start coordinates of the current slot (shorter in the if)
+			var slotCoordinates = this.getSlotCoordinates(i);
+			/*Check if the Mouse is over the slot
+			 >= to start coordinates
+			 <= to start coordinates + the scaled size of the slot */
+			if (x >= slotCoordinates.x && 
+				y >= slotCoordinates.y &&
+				x <= slotCoordinates.x + 16 * this.scale &&
+				y <= slotCoordinates.y + 16 * this.scale)
 			{
-				//Make a variable for the start coordinates of the current slot (shorter in the if)
-				var slotCoordinates = this.getSlotCoordinates(i);
-				/*Check if the Mouse is over the slot
-				 >= to start coordinates
-				 <= to start coordinates + the scaled size of the slot */
-				if (x >= slotCoordinates.x && 
-					y >= slotCoordinates.y &&
-					x <= slotCoordinates.x + 16 * this.scale &&
-					y <= slotCoordinates.y + 16 * this.scale)
-				{
-					//Mouse is over a filled slot
-					return this[cntnt[c]][i].stack;
-				}
+				//Mouse is over a filled slot
+				return this.content[i].stack;
 			}
 		}
 		//If the Mouse is not over a filled slot, return false

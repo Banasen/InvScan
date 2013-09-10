@@ -40,26 +40,15 @@
 				{
 					//Change Tool-Tip to the item's name
 					infoBox.children.infoBoxText.innerHTML = stack.name;
-					if (useFunction)
-					{
-						//Make the background fit the new Text
-						infoBox.children.infoBoxTextureMiddle.style.setAttribute("width", (infoBox.children.infoBoxText.offsetWidth - 8) + "px");
-						infoBox.children.infoBoxTextureRight.style.setAttribute("left", (infoBox.children.infoBoxText.offsetWidth - 4) + "px");
-						//Make the Tool-Tip visible and move it to the Mouse (not exactly to it, so it doesn't flicker when you move the mouse in that direction)
-						infoBox.style.setAttribute("left", (event.pageX + 10) + "px");
-						infoBox.style.setAttribute("top", (event.pageY - 38) + "px");
-						infoBox.style.setAttribute("visibility", "visible");
-					}
-					else
-					{
-						//Make the background fit the new Text
-						infoBox.children.infoBoxTextureMiddle.style.setProperty("width", (infoBox.children.infoBoxText.offsetWidth - 8) + "px");
-						infoBox.children.infoBoxTextureRight.style.setProperty("left", (infoBox.children.infoBoxText.offsetWidth - 4) + "px");
-						//Make the Tool-Tip visible and move it to the Mouse (not exactly to it, so it doesn't flicker when you move the mouse in that direction)
-						infoBox.style.setProperty("left", (event.pageX + 10) + "px");
-						infoBox.style.setProperty("top", (event.pageY - 38) + "px");
-						infoBox.style.setProperty("visibility", "visible");
-					}
+					
+					//Make the background fit the new Text
+					infoBox.children.infoBoxTextureMiddle.style.setAttribute("width", (infoBox.children.infoBoxText.offsetWidth - 8) + "px");
+					infoBox.children.infoBoxTextureRight.style.setAttribute("left", (infoBox.children.infoBoxText.offsetWidth - 4) + "px");
+					
+					//Make the Tool-Tip visible and move it to the Mouse (not exactly to it, so it doesn't flicker when you move the mouse in that direction)
+					infoBox.style.setAttribute("left", (event.pageX + 10) + "px");
+					infoBox.style.setAttribute("top", (event.pageY - 38) + "px");
+					infoBox.style.setAttribute("visibility", "visible");
 				}
 				else
 				{
@@ -69,14 +58,7 @@
 			//Function to hide the Tool-Tip when the Mouse leaves the canvas for the inventory
 			hideInfoBox = function()
 			{
-				if (useFunction)
-				{
-					document.getElementById("infoBox").style.setAttribute("visibility", "hidden");
-				}
-				else
-				{
-					document.getElementById("infoBox").style.setProperty("visibility", "hidden");
-				}
+				document.getElementById("infoBox").style.setAttribute("visibility", "hidden");
 			};
 			//Change to position stuff ...
 			clearCache = function()
@@ -137,13 +119,6 @@
 			<span id="infoBoxText" style="position:absolute; top:0px; left:0px; padding:6px; white-space:nowrap;">Test</span>
 		</div>
 		<script>
-			//Check style modification
-			useFunction = false;
-			if (document.body.style.setAttribute)
-			{
-				useFunction = true;
-			}
-			
 			inventory = new chestInventory("inventory", 1, "", [], []);
 			
 			addOptions = function(response)
