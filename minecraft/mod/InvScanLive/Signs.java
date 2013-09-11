@@ -2,9 +2,16 @@ package InvScanLive;
 
 import java.awt.List;
 import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import cpw.mods.fml.common.Mod.Block;
 import cpw.mods.fml.common.network.Player;
@@ -26,6 +33,7 @@ public class Signs {
 	static boolean passAndUser = false;
 	static boolean passw = false;
 	public String[] sigsText = new String[] { "", "", "", "" };
+	ArrayList<String> Proclist = loadArray();
 
 	// on rightclick print sign text, because i can't find shiz...
 	@ForgeSubscribe
@@ -56,19 +64,54 @@ public class Signs {
 			once = false;
 		}
 	}
+	
+	public void saveArray(ArrayList<String> proclist2) {
+		try {
+			FileOutputStream fos = new FileOutputStream("config/chests.db");
+			GZIPOutputStream gzos = new GZIPOutputStream(fos);
+			ObjectOutputStream out = new ObjectOutputStream(gzos);
+			out.writeObject(proclist2);
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+	}
+	
+	
+	public ArrayList<String> loadArray() {
+		try {
+			FileInputStream fis = new FileInputStream("config/chests.db");
+			GZIPInputStream gzis = new GZIPInputStream(fis);
+			ObjectInputStream in = new ObjectInputStream(gzis);
+			ArrayList<String> input_array = (ArrayList<String>) in.readObject();
+			in.close();
+			return input_array;
+		} catch (Exception e) {
+			System.out.println("Database not found, will save db on exit");
+			saveArray(Proclist);
+			return Proclist;
+		}
+	}
+	
+	public void splitString(String dbOutput, int index) {
+		StringTokenizer stringtokenizer = new StringTokenizer(dbOutput, ":");
+		if (stringtokenizer.hasMoreElements()) {
+			int x = Integer.parseInt(stringtokenizer.nextToken());
+			int y = Integer.parseInt(stringtokenizer.nextToken());
+			int z = Integer.parseInt(stringtokenizer.nextToken());
+			int signx = Integer.parseInt(stringtokenizer.nextToken());
+			int signy = Integer.parseInt(stringtokenizer.nextToken());
+			int signz = Integer.parseInt(stringtokenizer.nextToken());
+			String pass = stringtokenizer.nextToken();
+			String user = stringtokenizer.nextToken();
+			/*if (get sign block  == not sign then) {
+				Proclist.remove(index);
+				return false;
+			}*/
+		}
+	}
 
-	/*
-	 * public List getTileEntities(int i, int j, int k, int l, int i1, int j1) {
-	 * List arraylist = new List(); // check in chunks: usually just from one
-	 * for (int cx = (i >> 4); cx <= ((l - 1) >> 4); cx++) { for (int cz = (k >>
-	 * 4); cz <= ((j1 - 1) >> 4); cz++) { Chunk c = getChunkAt(cx, cz); if (c ==
-	 * null) continue; for (Object te : c.chunkTileEntityMap.values()) {
-	 * TileEntity tileentity = (TileEntity) te; if ((!tileentity.isInvalid()) &&
-	 * (tileentity.xCoord >= i) && (tileentity.yCoord >= j) &&
-	 * (tileentity.zCoord >= k) && (tileentity.xCoord < l) && (tileentity.yCoord
-	 * < i1) && (tileentity.zCoord < j1)) { arraylist.add(tileentity); } } } }
-	 * return arraylist; }
-	 */
 	// check sign contents
 	public static boolean isValidPreparedSign(String[] lines) {
 		String scan = "[INVSCAN]";

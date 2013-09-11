@@ -14,29 +14,30 @@ import net.minecraft.item.ItemStack;
 
 public class WebPhpPost {
 	public static void PrepPost(String PlayerName,IInventory inventory,boolean chest){
-		if(chest){
-			//item[slothere][id]=id&item[slothere][damage]=damagehere&item[slothere][rawName]=rawnamehere&item[slothere][name]=name&item[slothere][size]=sizehere&
-		}
-		else{
-			String toPost="?name="+PlayerName+invToMap(inventory);
+			String toPost="?name="+PlayerName+invToMap(inventory,chest);
+			//save string to db Signs.addchestInv();
 			try {
 				sendPost(toPost);
 				System.out.println(toPost);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
 	}
 	
-	public static String invToMap(IInventory inventory) {
+	public static String invToMap(IInventory inventory,boolean chest) {
 		String output = "";
 			for (int i = 0; i < inventory.getSizeInventory(); i++) {
 				HashMap map2 = itemstackToMap(inventory.getStackInSlot(i));
 				if(map2.containsValue("Air")){
 					continue;
 				}
+				if(chest){
+				  output = output + "item["+i+"][id]="+map2.get("id")+"&item["+i+"][damage]="+map2.get("DamageValue")+"&item["+i+"][rawName]="+map2.get("RawName")+"&item["+i+"][name]="+map2.get("Name")+"item["+i+"][size]="+map2.get("Size")+"&";
+				}
+				else{
 				  output = output + "item["+i+"][rawName]="+map2.get("RawName")+"&item["+i+"][name]="+map2.get("Name")+"item["+i+"][size]="+map2.get("Size")+"&";
 			}
+		}
 		return output;
 	}
 	
@@ -54,7 +55,6 @@ public class WebPhpPost {
 	}
 
 	public static String getRawNameForStack(ItemStack is) {
-
 		String rawName = "unknown";
 
 		try {
@@ -90,6 +90,7 @@ public class WebPhpPost {
 			map.put("Size", itemstack.stackSize);
 			map.put("DamageValue", itemstack.getItemDamage());
 			map.put("MaxStack", itemstack.getMaxStackSize());
+			map.put("id", itemstack.itemID);
 			return map;
 		}
 	}
