@@ -8,7 +8,6 @@ for _,s in pairs(rs.getSides()) do
         end
   end
 end
-
 baseUrl = "http://sp.svennp.com/invscan/php/"
 Args = {...}
 
@@ -16,8 +15,8 @@ if not Args[2] and Args[1] then
    error("chestname must be given! Usage: invscan chest(true/false) chestname [playerName](if chest)")
 elseif not Args[3] and Args[1] then
    error("playername must be given! Usage: invscan chest(true/false) chestname [playerName](if chest)")
-elseif not Args[1] and not sensorr then
-   error("Tried to scan players without sensor attached.....")
+elseif not Args[1] and not sensorr or proxSensor.getSensorName() ~= "proximityCard"then
+   error("Tried to scan players without sensor and Proximitycard attached.....")
 end
 
 local function httpreq(bUrl,postInfo)
@@ -53,7 +52,7 @@ while true do
 					postInfo = postInfo.."item["..slot.."][size]="..stack.Size.."&"
 				end
 			end
-			httpreq(baseURL.."postChest.php?name="..name, postInfo)
+			httpreq(baseUrl.."postChest.php?name="..name, postInfo)
 		end
 	end
 	sleep(4)
