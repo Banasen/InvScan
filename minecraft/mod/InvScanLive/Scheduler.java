@@ -9,10 +9,12 @@ public class Scheduler implements IScheduledTickHandler {
 Integer spacing = Config.Refrate*20*60;
 	@Override
 	public void tickStart(EnumSet<TickType> type, Object... tickData) {
+	    InvScanLive.uploadAllPlayerInvs();
 	}
 
 	@Override
 	public void tickEnd(EnumSet<TickType> type, Object... tickData) {
+		InvScanLive.uploadAllChests();
 	}
 
 	@Override

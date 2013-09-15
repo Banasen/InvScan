@@ -11,11 +11,11 @@ import net.minecraft.item.ItemStack;
 
 public class WebPhpPost {
 	public static void PrepPost(String PlayerName,IInventory inventory,boolean chest,boolean nopost){
+		    // needs to be fixed for chests post!
 			String toPost="?name="+PlayerName+invToMap(inventory,chest);
-			//save string to db Signs.addchestInv();
 			if(!nopost){
 			try {
-				sendPost(toPost);
+				sendPost(toPost,chest);
 				System.out.println(toPost);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -96,23 +96,22 @@ public class WebPhpPost {
 	}
 	
 
-	public static void sendPost(String urlParameters) throws Exception{
+	public static void sendPost(String urlParameters,boolean chest) throws Exception{
     //init parameters.
-		URL url = new URL(Config.connectURL+"?");
+	URL url;
+	if (!chest){
+	   url = new URL(Config.connectURL+"PostPlayer.php?");
+	}
+	else{
+	   url = new URL(Config.connectURL+"PostChest.php?");
+	}
 		URLConnection conn = url.openConnection();
 		String line;
-		//conn.setDoOutput(true);  response if true
+		conn.setDoOutput(true);
     // send to webserver
 		OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
 		writer.write(urlParameters);
 		writer.flush();
-	/*  read response??!?!
-		BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream())); 
-		while ((line = reader.readLine()) != null) {
-		    System.out.println(line);
-		}
-	*/
 		writer.close();
-	//	reader.close();  close input reader
 	}
 }

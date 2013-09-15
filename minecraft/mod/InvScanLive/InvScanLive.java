@@ -2,9 +2,12 @@ package InvScanLive;
 
 import java.util.Iterator;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.Mod;
@@ -38,7 +41,7 @@ public class InvScanLive {
 	public void serverLoad(FMLServerStartingEvent event) {
 		event.registerServerCommand(new Commands());
 		MinecraftForge.EVENT_BUS.register(new Signs());
-		if(Config.Refrate != 0){
+		if(!Config.Refrate.equals(0)){
 		TickRegistry.registerScheduledTickHandler(new Scheduler(), Side.SERVER);
 		}
 		else{System.out.println("[INFO] [InvScan] Config value for timer is false! ignoring timer");}
@@ -59,9 +62,40 @@ public class InvScanLive {
 		}
 	}
 
-	public static void uploadAllChests() {
-     // for ChestName.length do get inventory from list and post ---
-		//Signs.Proclist.iterator().
-		//WebPhpPost.PrepPost(ChestName, chest, true);
+	public static boolean uploadAllChests() {
+		if (Signs.Proclist != null) {
+			while (Signs.Proclist.iterator().hasNext()) {
+				Signs.createDbString(MinecraftServer.getServer().worldServerForDimension(1).provider.worldObj, Signs.signx, Signs.signy, Signs.signz, Signs.pass, Signs.user);
+			}
+		}
+		else{
+			return false;
+		}
+		return true;
+	}
+	
+	public static void maketextures(){
+		for (int i = 1; i < Item.itemsList.length; i++)
+	      {
+	        if ((i < Block.blocksList.length) && (Block.blocksList[i] != null) && (Block.blocksList[i].blockID != 0))
+	        {
+	            Block block = Block.blocksList[i];
+	            String name = block.getUnlocalizedName();
+	            if (name == null) {
+	              name = block.getClass().getCanonicalName();
+	            }
+	            System.out.println("Block. Name: " + name + ". ID: " + i);
+	            
+	        } else if (Item.itemsList[i] != null)
+	        {
+	            Item item = Item.itemsList[i];
+	            String name = item.getUnlocalizedName();
+	            if (name == null) {
+	              name = item.getClass().getCanonicalName();
+	            }
+	            System.out.println("Item. Name: " + name + ". ID: " + i);
+	          }
+	      }
+		//compile zip output if error then send errormsg to player
 	}
 }

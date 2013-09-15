@@ -22,20 +22,36 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 public class Signs {
 	static boolean passAndUser = false;
 	static boolean passw = false;
+	static int index;
+	public static int signx;
+	public static int signy;
+	public static int signz;
+	public static String user;
+	public static String pass;
+	public static String chestcoord;
 	public static String chestdata;
-	public String[] sigsText = new String[] { "", "", "", "" };
-	public static ArrayList<String> Proclist = new ArrayList<String>();
+	public static String[] sigsText = new String[] { "", "", "", "" };
+	public static ArrayList<String> Proclist;
 
 	// on rightclick print sign text, because i can't find shiz...
+
 	@ForgeSubscribe
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		if (!e.entityPlayer.worldObj.isRemote) {
 			boolean wasinDb = isInDb(e.x, e.y, e.z);
-			if (wasinDb) {
+			System.out.println("interact server");
+			if (wasinDb&&e.action.equals(e.action.RIGHT_CLICK_BLOCK)) {
 				e.entityPlayer.sendChatToPlayer("was in db already.");
-			} else if (e.entityPlayer.worldObj
-					.blockHasTileEntity(e.x, e.y, e.z)
+				return;
+			}
+			else if(e.action.equals(e.action.LEFT_CLICK_BLOCK)&&wasinDb){
+					Proclist.remove(index);
+					e.entityPlayer.sendChatToPlayer("removed index: "+index);
+					return;
+				}
+		    else if (e.entityPlayer.worldObj.blockHasTileEntity(e.x, e.y, e.z)
 					&& e.entityPlayer.worldObj.getBlockId(e.x, e.y, e.z) == 68
+					&& e.action.equals(e.action.RIGHT_CLICK_BLOCK)
 					&& !wasinDb) {
 				TileEntity sign = e.entityPlayer.worldObj.getBlockTileEntity(
 						e.x, e.y, e.z);
@@ -63,22 +79,24 @@ public class Signs {
 				} else {
 					System.out.println("INVALID SIGN!");
 				}
-			}
+		    }
 		}
 	}
 
 	public static boolean isInDb(int x, int y, int z) {
 		if (Proclist != null) {
+			index = 0;
 			while (Proclist.iterator().hasNext()) {
 				if (splitString(Proclist.iterator().next(), x, y, z)) {
 					return true;
 				}
+				index = index + 1;
 			}
 		}
 		return false;
 	}
 
-	public void createDbString(World world, int x, int y, int z, String pass,
+	public static void createDbString(World world, int x, int y, int z, String pass,
 			String user) {
 		IInventory chestinv = getnearbyChestInv(
 				getDirectionofSign(world, x, y, z), world, x, y, z);
@@ -86,8 +104,9 @@ public class Signs {
 			WebPhpPost.PrepPost(sigsText[1], chestinv, true, true);
 			// signx,signy,signz,chestcord,lastchestinv,user,pass
 			String dbstring = x + ":" + y + ":" + z + ":"
-					+ getDirectionofSign(world, x, y, z) + ":" + chestdata
+			+ getDirectionofSign(world, x, y, z) + ":" + chestdata
 					+ ":" + pass + ":" + user;
+			// compare dbstring to dbstrings in database
 			if (Proclist != null) {
 				while (Proclist.iterator().hasNext()) {
 					if (Proclist.iterator().next() == dbstring) {
@@ -97,12 +116,11 @@ public class Signs {
 				}
 			}
 			try {
-				WebPhpPost.sendPost(chestdata);
+				WebPhpPost.sendPost(chestdata,true);
 				Proclist.add(dbstring);
 			} catch (Exception e) {
 				System.out.println("failed to send post to server ...");
 			}
-			// compare dbstring to dbstrings in database
 			System.out.println(dbstring);
 		} else {
 			System.out.println("but no chest! xD");
@@ -122,7 +140,7 @@ public class Signs {
 		}
 	}
 
-	public String getDirectionofSign(IBlockAccess par1IBlockAccess, int par2,
+	public static String getDirectionofSign(IBlockAccess par1IBlockAccess, int par2,
 			int par3, int par4) {
 		int l = par1IBlockAccess.getBlockMetadata(par2, par3, par4);
 		if (l == 2) {
@@ -144,7 +162,7 @@ public class Signs {
 		}
 	}
 
-	public IInventory getnearbyChestInv(String signdirection, World world,
+	public static IInventory getnearbyChestInv(String signdirection, World world,
 			int x, int y, int z) {
 		if (signdirection.contentEquals("z+") && world.blockExists(x, y, z + 1)) {
 			if (world.blockHasTileEntity(x, y, z + 1)) {
@@ -191,6 +209,7 @@ public class Signs {
 			return input_array;
 		} catch (Exception e) {
 			System.out.println("Database not found, will save db on exit");
+			ArrayList<String> Proclist = new ArrayList<String>();
 			saveArray(Proclist);
 			return Proclist;
 		}
@@ -199,28 +218,28 @@ public class Signs {
 	public static boolean splitString(String dbOutput, int x, int y, int z) {
 		StringTokenizer stringtokenizer = new StringTokenizer(dbOutput, ":");
 		if (stringtokenizer.hasMoreElements()) {
-			int signx = Integer.parseInt(stringtokenizer.nextToken());
-			int signy = Integer.parseInt(stringtokenizer.nextToken());
-			int signz = Integer.parseInt(stringtokenizer.nextToken());
-			String chestcord = stringtokenizer.nextToken();
+			signx = Integer.parseInt(stringtokenizer.nextToken());
+			signy = Integer.parseInt(stringtokenizer.nextToken());
+			signz = Integer.parseInt(stringtokenizer.nextToken());
+			chestcoord = stringtokenizer.nextToken();
 			String laschestinv = stringtokenizer.nextToken();
-			String pass = stringtokenizer.nextToken();
-			String user = stringtokenizer.nextToken();
+			pass = stringtokenizer.nextToken();
+			user = stringtokenizer.nextToken();
 			if (x == signx && y == signy && z == signz) {
 				return true;
-			} else if (chestcord.contentEquals("z-")) {
+			} else if (chestcoord.contentEquals("z-")) {
 				if (signx == x && signy == y && signz - 1 == z) {
 					return true;
 				}
-			} else if (chestcord.contentEquals("z+")) {
+			} else if (chestcoord.contentEquals("z+")) {
 				if (signx == x && signy == y && signz + 1 == z) {
 					return true;
 				}
-			} else if (chestcord.contentEquals("x+")) {
+			} else if (chestcoord.contentEquals("x+")) {
 				if (signx + 1 == x && signy == y && signz == z) {
 					return true;
 				}
-			} else if (chestcord.contentEquals("x-")) {
+			} else if (chestcoord.contentEquals("x-")) {
 				if (signx + 1 == x && signy == y && signz == z) {
 					return true;
 				}

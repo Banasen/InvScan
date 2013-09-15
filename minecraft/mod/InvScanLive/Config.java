@@ -11,10 +11,10 @@ public class Config {
 	
 	public static void loadConfig(Configuration config) {
 		config.load();
-		connectURL = config.get("Web", "ConnectURL", "mywebserver.info/index.php").getString();
+		connectURL = config.get("Web", "ConnectURL", "http://mywebserver.info/php/").getString();
 		rate = config.get("Web", "UploadC", false);
 		rate.comment = "Upload data by timer/minute(int) or false for logout and itemchange";
-		if(rate.getBoolean(false || rate.getInt() < 0)){
+		if(rate.getBoolean(false) || rate.getInt() < 0){
 			Refrate = 0;
 		}
 		else{
@@ -25,7 +25,7 @@ public class Config {
 		maketexture = mkT.getBoolean(true);
 		DEBUG = config.get("Misc", "DEBUG", false).getBoolean(true);
 		ChestUP = config.get("Misc", "ChestUP", false);
-		ChestUP.comment = "Upload chest contents regardless of signs?";
+		ChestUP.comment = "Upload chest contents regardless of signs? (nonfunctional right now)";
 		uploadchests = ChestUP.getBoolean(true);
 		config.save();
 	}

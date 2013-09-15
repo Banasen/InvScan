@@ -41,9 +41,8 @@ public class Commands implements ICommand {
 		String spm = "?";
 		String makt = "maket";
 	    if(carg.equals(makt) && Config.maketexture){
-	    	// compile a zip with all textures
 	    	icommandsender.sendChatToPlayer("Creating textures..... plox wait");
-	    	//invscan.createPack();
+	    	InvScanLive.maketextures();
 	    }
 	    else if(carg.equals(upl)){
 	    	InvScanLive.uploadAllPlayerInvs();
