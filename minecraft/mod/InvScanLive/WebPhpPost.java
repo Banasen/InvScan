@@ -1,27 +1,27 @@
 package InvScanLive;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 
+
 public class WebPhpPost {
-	public static void PrepPost(String PlayerName,IInventory inventory,boolean chest){
+	public static void PrepPost(String PlayerName,IInventory inventory,boolean chest,boolean nopost){
 			String toPost="?name="+PlayerName+invToMap(inventory,chest);
 			//save string to db Signs.addchestInv();
+			if(!nopost){
 			try {
 				sendPost(toPost);
 				System.out.println(toPost);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			}
+			else{Signs.chestdata = toPost;}
 	}
 	
 	public static String invToMap(IInventory inventory,boolean chest) {
@@ -96,7 +96,7 @@ public class WebPhpPost {
 	}
 	
 
-	private static void sendPost(String urlParameters) throws Exception{
+	public static void sendPost(String urlParameters) throws Exception{
     //init parameters.
 		URL url = new URL(Config.connectURL+"?");
 		URLConnection conn = url.openConnection();
